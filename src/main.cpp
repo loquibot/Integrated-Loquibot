@@ -244,8 +244,10 @@ class $modify(LevelInfoLayer) {
                 auto scene = CCScene::create();
 
                 if (_isSearchScene) {
+#ifdef GEODE_IS_WINDOWS
                     auto layerSearch = LevelSearchLayer::create();
                     scene->addChild(layerSearch);
+#endif
                 }
                 else {
                     auto layerMenu = MenuLayer::scene(false);
