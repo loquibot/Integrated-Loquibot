@@ -218,30 +218,6 @@ class $modify(LevelInfoLayer) {
         return true;
     }
 
-
-    void keyBackClicked() {
-        if (_isLoquiMenu) {
-
-            auto scene = CCScene::create();
-
-            if (_isSearchScene) {
-                auto layerSearch = LevelSearchLayer::create();
-                scene->addChild(layerSearch);
-            }
-            else {
-                auto layerMenu = MenuLayer::scene(false);
-                scene->addChild(layerMenu);
-            }
-
-            auto transition = CCTransitionFade::create(0.5f, scene);
-
-            CCDirector::sharedDirector()->replaceScene(transition);
-        }
-        else {
-            LevelInfoLayer::keyBackClicked();
-        }
-    }
-
     void onViewProfile(CCObject* object) {
         if (_isLoquiMenu) {
             goToProfile();

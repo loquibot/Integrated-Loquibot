@@ -53,7 +53,6 @@
 **/.vs
 CMakeSettings.json
 out/
-libraries/
 
 # clangd
 .cache/
