@@ -28,7 +28,8 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
-      
+          sdk: nightly
+          
   package:
     name: Package both builds
     runs-on: ubuntu-latest
