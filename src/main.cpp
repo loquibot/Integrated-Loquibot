@@ -38,10 +38,14 @@ class $modify(MenuLayer) {
 
 };
 
+#ifdef GEODE_IS_WINDOWS
+
 class $modify(LevelSearchLayer) {
 
     bool init() {
+
         if (!LevelSearchLayer::init()) return false;
+
         _isSearchScene = true;
 
         auto buttonSprite = CCSprite::create("loqui.png"_spr);
@@ -60,11 +64,14 @@ class $modify(LevelSearchLayer) {
 
         this->addChild(menu);
 
+
+
         return true;
     }
 
 };
 
+#endif
 
 class $modify(LevelInfoLayer) {
 
