@@ -28,7 +28,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
-          cli: 2.5.0
+          cli: v2.5.0
   package:
     name: Package both builds
     runs-on: ubuntu-latest
