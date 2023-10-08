@@ -20,7 +20,7 @@ using namespace easywsclient;
 std::unique_ptr<WebSocket> ws(nullptr);
 
 void ServerListener::connectAsync() {
-    std::thread t(connect);
+    std::thread t = std::thread(connect);
     t.detach();
 }
 
@@ -31,6 +31,7 @@ void ServerListener::connect(){
 
     using easywsclient::WebSocket;
 
+#ifdef _WIN32
     INT rc;
     WSADATA wsaData;
 
@@ -38,6 +39,7 @@ void ServerListener::connect(){
     if (rc) {
         return;
     }
+#endif
 
     if (ws) {
         _loquiOpen = true;
@@ -56,7 +58,10 @@ void ServerListener::connect(){
     _loquiOpen = false;
     ws.release();
 
+#ifdef _WIN32
     WSACleanup();
+#endif
+
 }
 
 std::string _creator;
@@ -188,7 +193,7 @@ void ServerListener::onMessage(std::string message) {
 
                 LevelInfoLayer* layer = LevelInfoLayer::create(_levelData);
 
-                if (_levelData->m_levelString.empty()) {
+                if (_levelData->m_levelString.size() == 0) {
                     _levelData->m_levelNotDownloaded = true;
                     layer->downloadLevel();
                 }
