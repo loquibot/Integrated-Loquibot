@@ -29,6 +29,7 @@ jobs:
         with:
           combine: true
           cli: v2.5.0
+          sdk: nightly
   package:
     name: Package both builds
     runs-on: ubuntu-latest
