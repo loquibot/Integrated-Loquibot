@@ -6,6 +6,13 @@ on:
     branches:
       - "main"
 
+env:
+  GEODE_SDK: ${{ github.workspace }}/sdk
+  GEODE_VERSION: nightly
+  CLI_VERSION: v2.0.0
+  MOD_NAME: Integrated-Loquibot
+  MOD_ID: alphalaneous.integrated-loquibot
+
 jobs:
   build:
     strategy:
@@ -28,7 +35,6 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: true
-          sdk: nightly
           
   package:
     name: Package both builds
