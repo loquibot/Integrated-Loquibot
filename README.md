@@ -1,3 +1,3 @@
-# IntegratedLoquibot
+# Integrated Loquibot
 
-Ebic.
+Accesses the Loquibot level requests within Geometry Dash.
