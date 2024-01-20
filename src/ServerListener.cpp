@@ -101,6 +101,26 @@ void ServerListener::onMessage(std::string message) {
                 service = valueS.GetString();
             }
 
+            bool badUpdate = false;
+
+            if (levelJson.HasMember("version")) {
+                rapidjson::Value& valueS = levelJson["version"];
+                int version = valueS.GetInt();
+
+                if(!(version >= 1)){
+                    badUpdate = true;
+                }
+            }
+            else{
+                badUpdate = true;
+            }
+
+            if(badUpdate){
+                auto alertLayer = FLAlertLayer::create(nullptr, "Bad Version!", "Your Loquibot App is out of date!\nGo to <cg>loquibot.com/versionHelp.html</c> for more info.", "Okay", nullptr, 300);
+                alertLayer->show();
+                return;
+            }
+
             if (levelJson.HasMember("status")) {
 
                 rapidjson::Value& valueS = levelJson["status"];
