@@ -10,6 +10,7 @@
 #include <memory>
 #include <document.h>
 #include "ServerListener.h"
+#include "Loquibot.h"
 #include <Geode/Geode.hpp>
 #include <thread>
 
@@ -100,6 +101,33 @@ void ServerListener::onMessage(std::string message) {
                 service = valueS.GetString();
             }
 
+            if (levelJson.HasMember("status")) {
+
+                rapidjson::Value& valueS = levelJson["status"];
+                std::string status = valueS.GetString();
+
+                if(status == "empty"){
+                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                    alertLayer->show();
+                    return;
+                }
+
+            }
+
+            if (levelJson.HasMember("next_status")) {
+
+                rapidjson::Value& valueS = levelJson["next_status"];
+                std::string status = valueS.GetString();
+
+                if(status == "empty"){
+                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                    alertLayer->show();
+                    (new Loquibot())->showButtons(lastLayer);
+                    return;
+                }
+
+            }
+
             if (service == "gd") {
 
                 std::string creator = "-";
@@ -166,6 +194,14 @@ void ServerListener::onMessage(std::string message) {
                     ->m_onlineLevels
                     ->objectForKey(std::to_string(ID));
 
+                if(ID == _currentID){
+                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
+                    alertLayer->show();
+                    (new Loquibot())->showButtons(lastLayer);
+                    return;
+                }
+
+
                 if (level != nullptr) _levelData = reinterpret_cast<GJGameLevel*>(level);
                 else {
                     _levelData = GJGameLevel::create();
@@ -191,7 +227,7 @@ void ServerListener::onMessage(std::string message) {
                 _levelData->m_levelType = GJLevelType::Saved;
                 _currentID = ID;
 
-                LevelInfoLayer* layer = LevelInfoLayer::create(_levelData);
+                LevelInfoLayer* layer = LevelInfoLayer::create(_levelData, false);
 
                 if (_levelData->m_levelString.size() == 0) {
                     _levelData->m_levelNotDownloaded = true;

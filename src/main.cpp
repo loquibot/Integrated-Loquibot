@@ -3,6 +3,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/LevelSearchLayer.hpp>
+#include <Geode/modify/CCDirector.hpp>
 
 #include "ServerListener.h"
 #include "Loquibot.h"
@@ -42,9 +43,9 @@ class $modify(MenuLayer) {
 
 class $modify(LevelSearchLayer) {
 
-    bool init() {
+    bool init(int a1) {
 
-        if (!LevelSearchLayer::init()) return false;
+        if (!LevelSearchLayer::init(a1)) return false;
 
         _isSearchScene = true;
 
@@ -55,7 +56,7 @@ class $modify(LevelSearchLayer) {
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        button->setPosition({ winSize.width - 24, winSize.height - 130 });
+        button->setPosition({ winSize.width - 24, winSize.height - 170 });
 
         auto menu = CCMenu::create();
         menu->addChild(button);
@@ -75,12 +76,14 @@ class $modify(LevelSearchLayer) {
 
 class $modify(LevelInfoLayer) {
 
-    bool init(GJGameLevel * level) {
-        if (!LevelInfoLayer::init(level)) return false;
+    bool init(GJGameLevel * level, bool a2) {
+
+        if (!LevelInfoLayer::init(level, a2)) return false;
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
         if (level->m_levelID == _currentID) {
+			lastLayer = this;
             try {
                 _isLoquiMenu = true;
                 level->m_creatorName = _creator;
@@ -104,7 +107,7 @@ class $modify(LevelInfoLayer) {
                     menu_selector(Loquibot::goToTopLevel));
 
                 topButton->setTag(1348);
-                topButton->setPosition({ buttonXPos + 206, winSize.height / 2 + 160 });
+                topButton->setPosition({ 0, 0});
 
                 auto randomButtonSprite = CCSprite::create("LB_randomBtn.png"_spr);
                 randomButtonSprite->setFlipX(true);
@@ -192,7 +195,8 @@ class $modify(LevelInfoLayer) {
 
                 auto topButtonMenu = CCMenu::create();
 
-                topButtonMenu->setPosition({ 0,0 });
+                topButtonMenu->setPosition({buttonXPos, winSize.height / 2 + 80 });
+				topButtonMenu->setContentSize({0, 0});
                 topButtonMenu->setScale(0.5f);
                 topButtonMenu->setTag(4324);
 
@@ -211,6 +215,12 @@ class $modify(LevelInfoLayer) {
                 menu->setPosition({ 0,0 });
                 menu->addChild(topButtonMenu);
 
+				CCMenu* otherMenu = dynamic_cast<CCMenu*>(this->getChildByID("other-menu"));
+
+				CCMenuItemSpriteExtra* listButton = dynamic_cast<CCMenuItemSpriteExtra*>(otherMenu->getChildByID("list-button"));
+				CCMenuItemSpriteExtra* favoritesButton = dynamic_cast<CCMenuItemSpriteExtra*>(otherMenu->getChildByID("favorite-button"));
+
+				listButton->setPosition(favoritesButton->getPositionX(), favoritesButton->getPositionY()+40);
 
                 this->addChild(menu);
                 this->addChild(actionButtonMenu);
@@ -235,6 +245,7 @@ class $modify(LevelInfoLayer) {
     }
 
     void onBack(CCObject* object) {
+
         if (_isLoquiMenu) {
             if (_deleting) {
                 (new Loquibot())->goToNextLevel(this);
@@ -245,7 +256,7 @@ class $modify(LevelInfoLayer) {
 
                 if (_isSearchScene) {
 #ifdef GEODE_IS_WINDOWS
-                    auto layerSearch = LevelSearchLayer::create();
+                    auto layerSearch = LevelSearchLayer::create(0);
                     scene->addChild(layerSearch);
 #endif
                 }
@@ -256,10 +267,12 @@ class $modify(LevelInfoLayer) {
                 auto transition = CCTransitionFade::create(0.5f, scene);
                 CCDirector::sharedDirector()->replaceScene(transition);
             }
+			_currentID = -1;
         }
         else {
             LevelInfoLayer::onBack(object);
         }
+        LevelInfoLayer::onBack(object);
     }
 
     void onDelete(CCObject* object) {

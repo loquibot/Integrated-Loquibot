@@ -1,4 +1,3 @@
-#include "includes.h"
 #include "ServerListener.h"
 #include "Loquibot.h"
 #include "BlockLevelAlertProtocol.h"
@@ -23,15 +22,7 @@ void hideButtons(CCObject* obj) {
 
     if (menu->getTag() == 4323) {
 
-        auto nextButton = menu->getChildByTag(1345);
-        auto randomButton = menu->getChildByTag(1346);
-        auto undoButton = menu->getChildByTag(1347);
-        auto topMenu = menu->getChildByTag(4324);
-
-        nextButton->setVisible(false);
-        randomButton->setVisible(false);
-        undoButton->setVisible(false);
-        topMenu->setVisible(false);
+        menu->setVisible(false);
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -40,7 +31,7 @@ void hideButtons(CCObject* obj) {
 
 
         loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 70 });
-
+        loadingSprite->setTag(76532);
         loadingSprite->setScale(0.5);
         loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
 
@@ -51,6 +42,18 @@ void hideButtons(CCObject* obj) {
 
         menu->getParent()->addChild(loadingSprite);
     }
+}
+
+void Loquibot::showButtons(CCObject* obj) {
+
+    CCLayer* layer = reinterpret_cast<CCLayer*>(obj);
+    
+    auto menu = layer->getChildByTag(4323);
+
+    menu->setVisible(true);
+
+    menu->getParent()->removeChildByTag(76532);
+    
 }
 
 void Loquibot::goToLevel(CCObject* obj) {
@@ -64,7 +67,7 @@ void Loquibot::goToLevel(CCObject* obj) {
     }
     else {
 
-        ServerListener::sendMessage("get");
+        ServerListener::sendMessage("current_get");
         _isButtonPressed = true;
 
         hideButtons(obj);
