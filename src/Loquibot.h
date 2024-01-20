@@ -5,6 +5,7 @@
 
 class Loquibot {
 protected:
+    static Loquibot* instance;
 public:
     void showButtons(CCObject*);
     void goToLevel(CCObject*);
@@ -16,7 +17,17 @@ public:
     void blockLevel(CCObject*);
     void blockCreator(CCObject*);
     void blockRequester(CCObject*);
+    void operator=(const Loquibot &) = delete;
+
+    static Loquibot* getSharedInstance(){
+
+        if (!instance) {
+            instance = new Loquibot();
+        };
+        return instance;
+    }
 private:
 };
+
 
 #endif

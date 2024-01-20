@@ -13,6 +13,7 @@
 #include "Loquibot.h"
 #include <Geode/Geode.hpp>
 #include <thread>
+#include "GlobalVars.h"
 
 using namespace cocos2d;
 
@@ -43,7 +44,7 @@ void ServerListener::connect(){
 #endif
 
     if (ws) {
-        _loquiOpen = true;
+        GlobalVars::getSharedInstance()->loquiOpen = true;
 
         while (ws->getReadyState() != WebSocket::CLOSED) {
             WebSocket::pointer wsp = &*ws; // a unique_ptr cannot be copied into a lambda
@@ -56,7 +57,7 @@ void ServerListener::connect(){
 
     //closed
 
-    _loquiOpen = false;
+    GlobalVars::getSharedInstance()->loquiOpen = false;
     ws.release();
 
 #ifdef _WIN32
@@ -65,24 +66,6 @@ void ServerListener::connect(){
 
 }
 
-std::string _creator;
-std::string _requester;
-int _accountID;
-int _rand;
-bool _isViewer = true;
-CCLayer* lastLayer;
-
-bool _isEmpty = false;
-bool _isStartLevel = true;
-bool _isButtonPressed = false;
-bool _loquiOpen = false;
-bool _isLoquiMenu = false;
-bool _deleting = false;
-bool _isSearchScene = false;
-int _currentID;
-
-GJGameLevel* _levelData = nullptr;
-
 
 void ServerListener::onMessage(std::string message) {
     geode::Loader::get()->queueInMainThread([message]() {
@@ -90,7 +73,7 @@ void ServerListener::onMessage(std::string message) {
 
         geode::log::info("{}", message);
 
-        if (_isButtonPressed) {
+        if (GlobalVars::getSharedInstance()->isButtonPressed) {
             rapidjson::Document levelJson;
             levelJson.Parse<0>(message.c_str());
 
@@ -101,71 +84,72 @@ void ServerListener::onMessage(std::string message) {
                 service = valueS.GetString();
             }
 
-            bool badUpdate = false;
+            if (service == "gd") {
+                bool badUpdate = false;
 
-            if (levelJson.HasMember("version")) {
-                rapidjson::Value& valueS = levelJson["version"];
-                int version = valueS.GetInt();
+                if (levelJson.HasMember("version")) {
+                    rapidjson::Value& valueS = levelJson["version"];
+                    int version = valueS.GetInt();
 
-                if(!(version >= 1)){
+                    if(!(version >= 2)){
+                        badUpdate = true;
+                    }
+                }
+                else{
                     badUpdate = true;
                 }
-            }
-            else{
-                badUpdate = true;
-            }
 
-            if(badUpdate){
-                auto alertLayer = FLAlertLayer::create(nullptr, "Bad Version!", "Your Loquibot App is out of date!\nGo to <cg>loquibot.com/versionHelp.html</c> for more info.", "Okay", nullptr, 300);
-                alertLayer->show();
-                return;
-            }
-
-            if (levelJson.HasMember("status")) {
-
-                rapidjson::Value& valueS = levelJson["status"];
-                std::string status = valueS.GetString();
-
-                if(status == "empty"){
-                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                if(badUpdate){
+                    auto alertLayer = FLAlertLayer::create(nullptr, "Bad Version!", "Your Loquibot App is out of date!\nGo to <cg>loquibot.com/versionHelp.html</c> for more info.", "Okay", nullptr, 300);
                     alertLayer->show();
                     return;
                 }
 
-            }
+                if (levelJson.HasMember("status")) {
 
-            if (levelJson.HasMember("next_status")) {
+                    rapidjson::Value& valueS = levelJson["status"];
+                    std::string status = valueS.GetString();
 
-                rapidjson::Value& valueS = levelJson["next_status"];
-                std::string status = valueS.GetString();
+                    if(status == "empty"){
+                        auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                        alertLayer->show();
+                        return;
+                    }
 
-                if(status == "empty"){
-                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
-                    alertLayer->show();
-                    (new Loquibot())->showButtons(lastLayer);
-                    return;
                 }
 
-            }
+                if (levelJson.HasMember("next_status")) {
 
-            if (service == "gd") {
+                    rapidjson::Value& valueS = levelJson["next_status"];
+                    std::string status = valueS.GetString();
+
+                    if(status == "empty"){
+                        auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                        alertLayer->show();
+
+                        Loquibot::getSharedInstance()->showButtons(GlobalVars::getSharedInstance()->lastLayer);
+
+                        return;
+                    }
+
+                }
 
                 std::string creator = "-";
                 std::string requester = "-";
                 std::string name = "Unknown";
 
-                _isButtonPressed = false;
+                GlobalVars::getSharedInstance()->isButtonPressed = false;
 
                 rapidjson::Value& nameValue = levelJson["name"];
                 name = nameValue.GetString();
 
                 rapidjson::Value& creatorValue = levelJson["creator"];
                 creator = creatorValue.GetString();
-                _creator = creator;
+                GlobalVars::getSharedInstance()->creator = creator;
 
                 rapidjson::Value& requesterValue = levelJson["requester"];
                 requester = requesterValue.GetString();
-                _requester = requester;
+                GlobalVars::getSharedInstance()->requester = requester;
 
                 rapidjson::Value& idValue = levelJson["id"];
                 int ID = idValue.GetInt();
@@ -175,7 +159,7 @@ void ServerListener::onMessage(std::string message) {
 
                 rapidjson::Value& accountIDValue = levelJson["accountID"];
                 int accountID = accountIDValue.GetInt();
-                _accountID = accountID;
+                GlobalVars::getSharedInstance()->accountID = accountID;
 
                 rapidjson::Value& isCustomSongValue = levelJson["isCustomSong"];
                 bool isCustomSong = isCustomSongValue.GetBool();
@@ -214,43 +198,51 @@ void ServerListener::onMessage(std::string message) {
                     ->m_onlineLevels
                     ->objectForKey(std::to_string(ID));
 
-                if(ID == _currentID){
+                if(ID == GlobalVars::getSharedInstance()->currentID){
                     auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
                     alertLayer->show();
-                    (new Loquibot())->showButtons(lastLayer);
+
+                    Loquibot::getSharedInstance()->showButtons(GlobalVars::getSharedInstance()->lastLayer);
+
                     return;
                 }
 
 
-                if (level != nullptr) _levelData = reinterpret_cast<GJGameLevel*>(level);
+                if (level != nullptr) GlobalVars::getSharedInstance()->levelData = reinterpret_cast<GJGameLevel*>(level);
                 else {
-                    _levelData = GJGameLevel::create();
-                    _levelData->m_accountID = accountID;
 
-                    _levelData->m_levelID = ID;
+
+                    GlobalVars::getSharedInstance()->levelData = GJGameLevel::create();
+
+                    GJGameLevel* levelData = GlobalVars::getSharedInstance()->levelData;
+
+                    levelData->m_accountID = accountID;
+                    levelData->m_levelID = ID;
                 }
 
-                _levelData->m_levelName = name;
-                _levelData->m_creatorName = creator;
+                GJGameLevel* levelData = GlobalVars::getSharedInstance()->levelData;
 
-                _levelData->m_likes = likes;
-                _levelData->m_downloads = downloads;
-                _levelData->m_levelLength = length;
-                _levelData->m_stars = stars;
-                _levelData->m_featured = featuredScore;
-                _levelData->m_isEpic = isEpic;
-                _levelData->m_autoLevel = isAuto;
+                levelData->m_levelName = name;
+                levelData->m_creatorName = creator;
 
-                if (isCustomSong) _levelData->m_songID = songID;
-                _levelData->m_audioTrack = songID;
+                levelData->m_likes = likes;
+                levelData->m_downloads = downloads;
+                levelData->m_levelLength = length;
+                levelData->m_stars = stars;
+                levelData->m_featured = featuredScore;
+                levelData->m_isEpic = isEpic;
+                levelData->m_autoLevel = isAuto;
 
-                _levelData->m_levelType = GJLevelType::Saved;
-                _currentID = ID;
+                if (isCustomSong) levelData->m_songID = songID;
+                levelData->m_audioTrack = songID;
 
-                LevelInfoLayer* layer = LevelInfoLayer::create(_levelData, false);
+                levelData->m_levelType = GJLevelType::Saved;
+                GlobalVars::getSharedInstance()->currentID = ID;
 
-                if (_levelData->m_levelString.size() == 0) {
-                    _levelData->m_levelNotDownloaded = true;
+                LevelInfoLayer* layer = LevelInfoLayer::create(levelData, false);
+
+                if (levelData->m_levelString.size() == 0) {
+                    levelData->m_levelNotDownloaded = true;
                     layer->downloadLevel();
                 }
                 auto requesterLabel = reinterpret_cast<CCLabelBMFont*>(layer->getChildByTag(357832));
@@ -274,13 +266,12 @@ void ServerListener::onMessage(std::string message) {
 
 void ServerListener::sendMessage(std::string message) {
    
-    if (_loquiOpen) {
+    if (GlobalVars::getSharedInstance()->loquiOpen) {
         ws->send(message);
     }
 }
 
 void ServerListener::open() {
-
 
     ws.release();
     ws.reset(WebSocket::from_url("ws://127.0.0.1:19236"));

@@ -4,11 +4,15 @@
 #include "BlockCreatorAlertProtocol.h"
 #include "BlockRequesterAlertProtocol.h"
 #include <signal.h>
+#include "GlobalVars.h"
+
 using namespace cocos2d;
 
 std::string notice = "Please open <cg>loquibot</c> to continue. If it is open, try again";
 std::string title = "loquibot Not Opened!";
 std::string confirm = "Okay";
+
+Loquibot* Loquibot::instance = nullptr;
 
 void hideButtons(CCObject* obj) {
 
@@ -58,17 +62,17 @@ void Loquibot::showButtons(CCObject* obj) {
 
 void Loquibot::goToLevel(CCObject* obj) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
     
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
-    if (!_loquiOpen) {
+    if (!GlobalVars::getSharedInstance()->loquiOpen) {
         alertLayer->show();
     }
     else {
 
         ServerListener::sendMessage("current_get");
-        _isButtonPressed = true;
+        GlobalVars::getSharedInstance()->isButtonPressed = true;
 
         hideButtons(obj);
     }
@@ -76,17 +80,17 @@ void Loquibot::goToLevel(CCObject* obj) {
 
 void Loquibot::goToNextLevel(CCObject* obj) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
-    if (!_loquiOpen) {
+    if (!GlobalVars::getSharedInstance()->loquiOpen) {
         alertLayer->show();
     }
     else {
 
         ServerListener::sendMessage("next_get");
-        _isButtonPressed = true;
+        GlobalVars::getSharedInstance()->isButtonPressed = true;
 
         hideButtons(obj);
     }
@@ -94,17 +98,17 @@ void Loquibot::goToNextLevel(CCObject* obj) {
 
 void Loquibot::goToTopLevel(CCObject* obj) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
-    if (!_loquiOpen) {
+    if (!GlobalVars::getSharedInstance()->loquiOpen) {
         alertLayer->show();
     }
     else {
 
         ServerListener::sendMessage("top_get");
-        _isButtonPressed = true;
+        GlobalVars::getSharedInstance()->isButtonPressed = true;
 
         hideButtons(obj);
     }
@@ -113,16 +117,16 @@ void Loquibot::goToTopLevel(CCObject* obj) {
 
 void Loquibot::goToRandomLevel(CCObject* obj) {
    
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
-    if (!_loquiOpen) {
+    if (!GlobalVars::getSharedInstance()->loquiOpen) {
         alertLayer->show();
     }
     else {
         ServerListener::sendMessage("random_get");
-        _isButtonPressed = true;
+        GlobalVars::getSharedInstance()->isButtonPressed = true;
 
         hideButtons(obj);
     }
@@ -130,45 +134,45 @@ void Loquibot::goToRandomLevel(CCObject* obj) {
 
 void Loquibot::goToUndoLevel(CCObject* obj) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
-    if (!_loquiOpen) {
+    if (!GlobalVars::getSharedInstance()->loquiOpen) {
         alertLayer->show();
     }
     else {
         ServerListener::sendMessage("undo_get");
         hideButtons(obj);
 
-        _isButtonPressed = true;
+        GlobalVars::getSharedInstance()->isButtonPressed = true;
     }
 }
 
 
 void Loquibot::blockLevel(CCObject*) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
-    auto alertLayer = FLAlertLayer::create(new BlockLevelAlertProtocol, "Block Level?", ("Block <cr>" + std::to_string(_currentID) + "</c>?"), "Cancel", "Okay", 300);
+    auto alertLayer = FLAlertLayer::create(new BlockLevelAlertProtocol, "Block Level?", ("Block <cr>" + std::to_string(GlobalVars::getSharedInstance()->currentID) + "</c>?"), "Cancel", "Okay", 300);
     
     alertLayer->show();
 }
 
 void Loquibot::blockCreator(CCObject*) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
-    auto alertLayer = FLAlertLayer::create(new BlockCreatorAlertProtocol, "Block Creator?", ("Block <cr>" + _creator + "</c>?"), "Cancel", "Okay", 300);
+    auto alertLayer = FLAlertLayer::create(new BlockCreatorAlertProtocol, "Block Creator?", ("Block <cr>" + GlobalVars::getSharedInstance()->creator + "</c>?"), "Cancel", "Okay", 300);
 
     alertLayer->show();
 }
 
 void Loquibot::blockRequester(CCObject*) {
 
-    if (!_loquiOpen) ServerListener::connectAsync();
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
-    auto alertLayer = FLAlertLayer::create(new BlockRequesterAlertProtocol, "Block Requester?", ("Block <cr>" + _requester + "</c>?"), "Cancel", "Okay", 300);
+    auto alertLayer = FLAlertLayer::create(new BlockRequesterAlertProtocol, "Block Requester?", ("Block <cr>" + GlobalVars::getSharedInstance()->requester + "</c>?"), "Cancel", "Okay", 300);
 
     alertLayer->show();
 }

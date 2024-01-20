@@ -7,25 +7,6 @@
 
 using namespace cocos2d;
 
-extern GJGameLevel* _levelData;
-
-extern std::string _creator;
-extern std::string _requester;
-extern int _accountID;
-extern int _rand;
-extern bool _isViewer;
-extern CCLayer* lastLayer;
-
-extern bool _isEmpty;
-extern bool _isStartLevel;
-extern bool _isButtonPressed;
-extern bool _isLoquiMenu;
-extern bool _deleting;
-extern bool _loquiOpen;
-extern bool _isSearchScene;
-
-extern int _currentID;
-
 class ServerListener {
 protected:
 public:
@@ -35,8 +16,6 @@ public:
     static void open();
     static void onMessage(std::string message);
     static void sendMessage(std::string message);
-
-
 
 private:
 };
