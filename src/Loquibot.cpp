@@ -56,7 +56,9 @@ void Loquibot::showButtons(CCObject* obj) {
 
     menu->setVisible(true);
 
-    menu->getParent()->removeChildByTag(76532);
+    if(menu->getParent()->getChildByTag(76532)){
+        menu->getParent()->removeChildByTag(76532);
+    }
     
 }
 
