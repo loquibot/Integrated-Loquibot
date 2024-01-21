@@ -19,32 +19,33 @@ void hideButtons(CCObject* obj) {
     CCMenuItemSpriteExtra* button = reinterpret_cast<CCMenuItemSpriteExtra*>(obj);
     
     auto menu = button->getParent();
+    if(menu){
+        if (menu->getTag() == 4324) {
+            menu = menu->getParent();
+        }
 
-    if (menu->getTag() == 4324) {
-        menu = menu->getParent();
-    }
+        if (menu->getTag() == 4323) {
 
-    if (menu->getTag() == 4323) {
+            menu->setVisible(false);
 
-        menu->setVisible(false);
-
-        auto winSize = CCDirector::sharedDirector()->getWinSize();
-
-
-        CCSprite* loadingSprite = CCSprite::create("loadingCircle.png");
+            auto winSize = CCDirector::sharedDirector()->getWinSize();
 
 
-        loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 70 });
-        loadingSprite->setTag(76532);
-        loadingSprite->setScale(0.5);
-        loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
+            CCSprite* loadingSprite = CCSprite::create("loadingCircle.png");
 
-        loadingSprite->runAction(CCRepeatForever::create(
-            CCRotateBy::create(1.0f, 360)
-            )
-        );
 
-        menu->getParent()->addChild(loadingSprite);
+            loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 70 });
+            loadingSprite->setTag(76532);
+            loadingSprite->setScale(0.5);
+            loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
+
+            loadingSprite->runAction(CCRepeatForever::create(
+                CCRotateBy::create(1.0f, 360)
+                )
+            );
+
+            menu->getParent()->addChild(loadingSprite);
+        }
     }
 }
 
@@ -52,14 +53,18 @@ void Loquibot::showButtons(CCObject* obj) {
 
     CCLayer* layer = reinterpret_cast<CCLayer*>(obj);
     
-    auto menu = layer->getChildByTag(4323);
+    if(layer){
 
-    menu->setVisible(true);
+        auto menu = layer->getChildByTag(4323);
 
-    if(menu->getParent()->getChildByTag(76532)){
-        menu->getParent()->removeChildByTag(76532);
+        if(menu){
+            menu->setVisible(true);
+
+            if(menu->getParent()->getChildByTag(76532)){
+                menu->getParent()->removeChildByTag(76532);
+            }
+        }
     }
-    
 }
 
 void Loquibot::goToLevel(CCObject* obj) {

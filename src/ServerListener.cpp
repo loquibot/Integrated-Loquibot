@@ -79,6 +79,12 @@ void ServerListener::onMessage(std::string message) {
 
             std::string service = "none";
 
+            if (levelJson.HasMember("type")) {
+                rapidjson::Value& valueS = levelJson["type"];
+                std::string type = valueS.GetString();
+                return;
+            }
+
             if (levelJson.HasMember("service")) {
                 rapidjson::Value& valueS = levelJson["service"];
                 service = valueS.GetString();
@@ -124,7 +130,7 @@ void ServerListener::onMessage(std::string message) {
                     std::string status = valueS.GetString();
 
                     if(status == "empty"){
-                        auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
+                        auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
                         alertLayer->show();
 
                         Loquibot::getSharedInstance()->showButtons(GlobalVars::getSharedInstance()->lastLayer);
@@ -197,15 +203,6 @@ void ServerListener::onMessage(std::string message) {
                 CCObject* level = GameLevelManager::sharedState()
                     ->m_onlineLevels
                     ->objectForKey(std::to_string(ID));
-
-                if(ID == GlobalVars::getSharedInstance()->currentID){
-                    auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
-                    alertLayer->show();
-
-                    Loquibot::getSharedInstance()->showButtons(GlobalVars::getSharedInstance()->lastLayer);
-
-                    return;
-                }
 
 
                 if (level != nullptr) GlobalVars::getSharedInstance()->levelData = reinterpret_cast<GJGameLevel*>(level);

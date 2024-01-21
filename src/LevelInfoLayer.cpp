@@ -196,11 +196,11 @@ class $modify(LevelInfoLayer) {
                 CCDirector::sharedDirector()->replaceScene(transition);
             }
 			GlobalVars::getSharedInstance()->currentID = -1;
+            GlobalVars::getSharedInstance()->lastLayer = nullptr;
         }
         else {
             LevelInfoLayer::onBack(object);
         }
-        LevelInfoLayer::onBack(object);
     }
 
     void onDelete(CCObject* object) {
