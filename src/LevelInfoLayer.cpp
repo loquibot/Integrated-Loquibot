@@ -100,14 +100,8 @@ class $modify(LevelInfoLayer) {
 
                 auto requesterLabel = CCLabelBMFont::create("-", "bigFont.fnt");
 
-                if (!GlobalVars::getSharedInstance()->isViewer) {
-                    requesterLabel->setColor(ccRED);
-                    requesterLabel->setString(("Sent By " + GlobalVars::getSharedInstance()->requester + " (Offline)").c_str());
-                }
-                else {
-                    requesterLabel->setColor(ccGREEN);
-                    requesterLabel->setString(("Sent By " + GlobalVars::getSharedInstance()->requester).c_str());
-                }
+                requesterLabel->setColor(ccGREEN);
+                requesterLabel->setString(("Sent By " + GlobalVars::getSharedInstance()->requester).c_str());
 
                 requesterLabel->setPosition({ winSize.width / 2, winSize.height - 60 });
                 requesterLabel->setZOrder(10);
