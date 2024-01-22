@@ -3,8 +3,9 @@
 #include "ServerListener.h"
 #include "Loquibot.h"
 #include "GlobalVars.h"
+#include "GJGameLevel.h"
 
-void goToProfile();
+matjson::Value getFromArray(int id);
 
 class $modify(LevelInfoLayer) {
 
@@ -18,8 +19,25 @@ class $modify(LevelInfoLayer) {
 			GlobalVars::getSharedInstance()->lastLayer = this;
             try {
                 GlobalVars::getSharedInstance()->isLoquiMenu = true;
-                level->m_creatorName = GlobalVars::getSharedInstance()->creator;
-                level->m_accountID = GlobalVars::getSharedInstance()->accountID;
+
+                matjson::Value listLevel = getFromArray(level->m_levelID);
+
+                std::string creator;
+                std::string requester;
+                int accountID;
+
+                if(listLevel != nullptr){
+                    creator = listLevel["creator"].as_string();
+                    accountID = listLevel["accountID"].as_int();
+                    requester = listLevel["requester"].as_string();
+                }
+                else{
+                    creator = GlobalVars::getSharedInstance()->creator;
+                    accountID = GlobalVars::getSharedInstance()->accountID;
+                    requester = GlobalVars::getSharedInstance()->requester;
+                }
+                level->m_creatorName = creator;
+                level->m_accountID = accountID;
 
                 auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
                 nextButtonSprite->setFlipX(true);
@@ -101,7 +119,7 @@ class $modify(LevelInfoLayer) {
                 auto requesterLabel = CCLabelBMFont::create("-", "bigFont.fnt");
 
                 requesterLabel->setColor(ccGREEN);
-                requesterLabel->setString(("Sent By " + GlobalVars::getSharedInstance()->requester).c_str());
+                requesterLabel->setString(("Sent By " + requester).c_str());
 
                 requesterLabel->setPosition({ winSize.width / 2, winSize.height - 60 });
                 requesterLabel->setZOrder(10);
@@ -148,6 +166,19 @@ class $modify(LevelInfoLayer) {
 
 				listButton->setPosition(favoritesButton->getPositionX(), favoritesButton->getPositionY()+40);
 
+                CCMenu* backMenu = dynamic_cast<CCMenu*>(this->getChildByID("back-menu"));
+                auto levelListSprite = CCSprite::createWithSpriteFrameName("GJ_menuBtn_001.png");
+
+                CCMenuItemSpriteExtra* button = CCMenuItemSpriteExtra::create(levelListSprite, this, menu_selector(Loquibot::openLevelMenu));
+
+                CCMenu* childMenu = CCMenu::create();
+                childMenu->setContentSize({30,30});
+                childMenu->setPosition({56, 14});
+                childMenu->setScale(0.6f);
+                childMenu->addChild(button);
+
+                backMenu->addChild(childMenu);
+
                 this->addChild(menu);
                 this->addChild(actionButtonMenu);
 
@@ -161,22 +192,12 @@ class $modify(LevelInfoLayer) {
         return true;
     }
 
-    void onViewProfile(CCObject* object) {
-        if (GlobalVars::getSharedInstance()->isLoquiMenu) {
-            goToProfile();
-        }
-        else {
-            LevelInfoLayer::onViewProfile(object);
-        }
-    }
-
     void onBack(CCObject* object) {
 
         if (GlobalVars::getSharedInstance()->isLoquiMenu) {
             if (GlobalVars::getSharedInstance()->deleting) {
 
                 Loquibot::getSharedInstance()->goToNextLevel(this);
-
                 GlobalVars::getSharedInstance()->deleting = false;
             }
             else {
@@ -186,14 +207,17 @@ class $modify(LevelInfoLayer) {
 #ifdef GEODE_IS_WINDOWS
                     auto layerSearch = LevelSearchLayer::create(0);
                     scene->addChild(layerSearch);
+                    auto transition = CCTransitionFade::create(0.5f, scene);
+                    CCDirector::sharedDirector()->replaceScene(transition);
 #endif
                 }
                 else {
                     auto layerMenu = MenuLayer::scene(false);
                     scene->addChild(layerMenu);
+                    auto transition = CCTransitionFade::create(0.5f, scene);
+                    CCDirector::sharedDirector()->replaceScene(transition);
                 }
-                auto transition = CCTransitionFade::create(0.5f, scene);
-                CCDirector::sharedDirector()->replaceScene(transition);
+                
             }
 			GlobalVars::getSharedInstance()->currentID = -1;
             GlobalVars::getSharedInstance()->lastLayer = nullptr;
@@ -210,7 +234,14 @@ class $modify(LevelInfoLayer) {
 
 };
 
-void goToProfile() {
-    ProfilePage* page = ProfilePage::create(GlobalVars::getSharedInstance()->accountID, false);
-    page->show();
+matjson::Value getFromArray(int id){
+
+    matjson::Array levels = GlobalVars::getSharedInstance()->currentLevelList;
+
+    for(int i = 0; i < levels.size(); i++){
+        matjson::Value level = levels[i];
+        if(level["id"] == id) return level;
+    }
+
+    return nullptr;
 }

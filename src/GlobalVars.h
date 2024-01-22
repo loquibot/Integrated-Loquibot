@@ -27,6 +27,8 @@ public:
     bool loquiOpen;
     bool isSearchScene;
     bool isViewer;
+    bool onReqScene;
+    matjson::Array currentLevelList;
 
     static GlobalVars* getSharedInstance(){
 

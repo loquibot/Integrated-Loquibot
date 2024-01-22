@@ -5,6 +5,9 @@
 #include "BlockRequesterAlertProtocol.h"
 #include <signal.h>
 #include "GlobalVars.h"
+#include <Geode/Geode.hpp>
+#include "RequestsLayer.h"
+#include "GJGameLevel.h"
 
 using namespace cocos2d;
 
@@ -194,4 +197,10 @@ void Loquibot::goToMainScene(CCObject*) {
     CCDirector::sharedDirector()->pushScene(transition);
 }
 
+void Loquibot::openLevelMenu(CCObject*){
 
+    if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
+
+    ServerListener::sendMessage("list_get");
+    
+}

@@ -8,12 +8,13 @@
 #include <stdio.h>
 #include <string>
 #include <memory>
-#include <document.h>
 #include "ServerListener.h"
 #include "Loquibot.h"
 #include <Geode/Geode.hpp>
 #include <thread>
 #include "GlobalVars.h"
+#include "RequestsLayer.h"
+#include "GJGameLevel.h"
 
 using namespace cocos2d;
 
@@ -66,36 +67,62 @@ void ServerListener::connect(){
 
 }
 
+GJGameLevel* parseJsonToGameLevel(matjson::Value);
 
 void ServerListener::onMessage(std::string message) {
     geode::Loader::get()->queueInMainThread([message]() {
 
+        matjson::Value levelJson = matjson::parse(message.c_str());
 
-        geode::log::info("{}", message);
+        //geode::log::info("{}", message);
+
+        if (levelJson.contains("type")) {
+
+
+            std::string type = levelJson["type"].as_string();
+
+            if(type == "level_list"){
+                
+                CCArray* arr = CCArray::create();
+
+                matjson::Array levelArray = levelJson["levels"].as_array();
+                for (int i = 0; i < levelArray.size(); i++){
+
+                    GJGameLevel* level = parseJsonToGameLevel(levelArray.at(i));
+
+                    level->m_unkInt = i+1;
+                    arr->addObject(level);
+                }
+
+                GlobalVars::getSharedInstance()->currentLevelList = levelArray;
+
+                CCScene* scene = RequestsLayer::scene(arr);
+
+                auto transition = CCTransitionFade::create(0.5f, scene);
+            
+                CCDirector::sharedDirector()->pushScene(transition);
+
+            }
+            return;
+        }
 
         if (GlobalVars::getSharedInstance()->isButtonPressed) {
-            rapidjson::Document levelJson;
-            levelJson.Parse<0>(message.c_str());
-
+            
             std::string service = "none";
 
-            if (levelJson.HasMember("type")) {
-                rapidjson::Value& valueS = levelJson["type"];
-                std::string type = valueS.GetString();
+            if (levelJson.contains("type")) {
                 return;
             }
 
-            if (levelJson.HasMember("service")) {
-                rapidjson::Value& valueS = levelJson["service"];
-                service = valueS.GetString();
+            if (levelJson.contains("service")) {
+                service = levelJson["service"].as_string();
             }
 
             if (service == "gd") {
                 bool badUpdate = false;
 
-                if (levelJson.HasMember("version")) {
-                    rapidjson::Value& valueS = levelJson["version"];
-                    int version = valueS.GetInt();
+                if (levelJson.contains("version")) {
+                    int version = levelJson["version"].as_int();
 
                     if(!(version >= 2)){
                         badUpdate = true;
@@ -111,10 +138,9 @@ void ServerListener::onMessage(std::string message) {
                     return;
                 }
 
-                if (levelJson.HasMember("status")) {
+                if (levelJson.contains("status")) {
 
-                    rapidjson::Value& valueS = levelJson["status"];
-                    std::string status = valueS.GetString();
+                    std::string status = levelJson["status"].as_string();
 
                     if(status == "empty"){
                         auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
@@ -124,10 +150,9 @@ void ServerListener::onMessage(std::string message) {
 
                 }
 
-                if (levelJson.HasMember("next_status")) {
+                if (levelJson.contains("next_status")) {
 
-                    rapidjson::Value& valueS = levelJson["next_status"];
-                    std::string status = valueS.GetString();
+                    std::string status = levelJson["next_status"].as_string();
 
                     if(status == "empty"){
                         auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
@@ -146,59 +171,30 @@ void ServerListener::onMessage(std::string message) {
 
                 GlobalVars::getSharedInstance()->isButtonPressed = false;
 
-                rapidjson::Value& nameValue = levelJson["name"];
-                name = nameValue.GetString();
-
-                rapidjson::Value& creatorValue = levelJson["creator"];
-                creator = creatorValue.GetString();
+                name = levelJson["name"].as_string();
+                creator =  levelJson["creator"].as_string();
                 GlobalVars::getSharedInstance()->creator = creator;
 
-                rapidjson::Value& requesterValue = levelJson["requester"];
-                requester = requesterValue.GetString();
+                requester = levelJson["requester"].as_string();
                 GlobalVars::getSharedInstance()->requester = requester;
 
-                rapidjson::Value& idValue = levelJson["id"];
-                int ID = idValue.GetInt();
+                int ID = levelJson["id"].as_int();
+                int songID = levelJson["songID"].as_int();
 
-                rapidjson::Value& songIDValue = levelJson["songID"];
-                int songID = songIDValue.GetInt();
-
-                rapidjson::Value& accountIDValue = levelJson["accountID"];
-                int accountID = accountIDValue.GetInt();
+                int accountID = levelJson["accountID"].as_int();
                 GlobalVars::getSharedInstance()->accountID = accountID;
 
-                rapidjson::Value& isCustomSongValue = levelJson["isCustomSong"];
-                bool isCustomSong = isCustomSongValue.GetBool();
-
-                rapidjson::Value& likesValue = levelJson["likes"];
-                int likes = likesValue.GetInt();
-
-                rapidjson::Value& downloadsValue = levelJson["downloads"];
-                int downloads = downloadsValue.GetInt();
-
-                rapidjson::Value& lengthValue = levelJson["lengthValue"];
-                int length = lengthValue.GetInt();
-
-                rapidjson::Value& isDemonValue = levelJson["isDemon"];
-                bool isDemon = isDemonValue.GetBool();
-
-                rapidjson::Value& isAutoValue = levelJson["isAuto"];
-                bool isAuto = isAutoValue.GetBool();
-
-                rapidjson::Value& isEpicValue = levelJson["isEpic"];
-                bool isEpic = isEpicValue.GetBool();
-
-                rapidjson::Value& featuredScoreValue = levelJson["featuredScore"];
-                int featuredScore = featuredScoreValue.GetInt();
-
-                rapidjson::Value& difficultyValue = levelJson["difficulty"];
-                int difficulty = difficultyValue.GetInt();
-
-                rapidjson::Value& demonDifficultyValue = levelJson["demonDifficulty"];
-                int demonDifficulty = demonDifficultyValue.GetInt();
-
-                rapidjson::Value& starsValue = levelJson["stars"];
-                int stars = starsValue.GetInt();
+                bool isCustomSong = levelJson["isCustomSong"].as_bool();
+                int likes = levelJson["likes"].as_int();
+                int downloads = levelJson["downloads"].as_int();
+                int length = levelJson["lengthValue"].as_int();
+                bool isDemon = levelJson["isDemon"].as_bool();
+                bool isAuto = levelJson["isAuto"].as_bool();
+                bool isEpic = levelJson["isEpic"].as_bool();
+                int featuredScore = levelJson["featuredScore"].as_int();
+                int difficulty = levelJson["difficulty"].as_int();
+                int demonDifficulty = levelJson["demonDifficulty"].as_int();
+                int stars = levelJson["stars"].as_int();
 
                 CCObject* level = GameLevelManager::sharedState()
                     ->m_onlineLevels
@@ -218,6 +214,9 @@ void ServerListener::onMessage(std::string message) {
                 }
 
                 GJGameLevel* levelData = GlobalVars::getSharedInstance()->levelData;
+
+                ((LoquiGJGameLevel*)levelData)->m_fields->m_requester = requester;
+                ((LoquiGJGameLevel*)levelData)->m_fields->m_isRequest = true;
 
                 levelData->m_levelName = name;
                 levelData->m_creatorName = creator;
@@ -273,4 +272,81 @@ void ServerListener::open() {
     ws.release();
     ws.reset(WebSocket::from_url("ws://127.0.0.1:19236"));
 
+}
+
+GJGameLevel* parseJsonToGameLevel(matjson::Value levelJson){
+    std::string creator = "-";
+    std::string requester = "-";
+    std::string name = "Unknown";
+
+    name = levelJson["name"].as_string();
+    creator = levelJson["creator"].as_string();
+    requester = levelJson["requester"].as_string();
+    int ID = levelJson["id"].as_int();
+    int songID = levelJson["songID"].as_int();
+    int accountID = levelJson["accountID"].as_int();
+    bool isCustomSong = levelJson["isCustomSong"].as_bool();
+    int likes = levelJson["likes"].as_int();
+    int downloads = levelJson["downloads"].as_int();
+    int length = levelJson["lengthValue"].as_int();
+    bool isDemon = levelJson["isDemon"].as_bool();
+    bool isAuto = levelJson["isAuto"].as_bool();
+    bool isEpic = levelJson["isEpic"].as_bool();
+    int featuredScore = levelJson["featuredScore"].as_int();
+    int difficulty = levelJson["difficulty"].as_int();
+    int demonDifficulty = levelJson["demonDifficulty"].as_int();
+    int stars = levelJson["stars"].as_int();
+
+    GJGameLevel* levelData = GJGameLevel::create();
+
+    ((LoquiGJGameLevel*)levelData)->m_fields->m_requester = requester;
+    ((LoquiGJGameLevel*)levelData)->m_fields->m_isRequest = true;
+    int pos = GameLevelManager::sharedState()->m_onlineLevels->count();
+    levelData->m_levelIndex = pos;
+    levelData->m_accountID = accountID;
+    levelData->m_levelID = ID;
+
+    levelData->m_levelType = (GJLevelType) 4;
+    
+    levelData->m_levelName = name;
+    levelData->m_creatorName = creator;
+
+    levelData->m_difficulty = (GJDifficulty) (difficulty-1);
+
+    int demonDifficultyValue = 0;
+
+    switch(demonDifficulty){
+        case 0:
+            demonDifficultyValue = 3;
+            break;
+        case 1:
+            demonDifficultyValue = 4;
+            break;
+        case 2:
+            demonDifficultyValue = 2;
+            break;
+        case 3:
+            demonDifficultyValue = 5;
+            break;
+        case 4:
+            demonDifficultyValue = 6;
+            break;
+    }
+
+    levelData->m_demonDifficulty = demonDifficultyValue;
+    levelData->m_autoLevel = isAuto;
+    levelData->m_demon = isDemon;
+    levelData->m_ratingsSum = 10*(int)levelData->m_difficulty;
+    levelData->m_ratings = 10;
+    levelData->m_likes = likes;
+    levelData->m_downloads = downloads;
+    levelData->m_levelLength = length;
+    levelData->m_stars = stars;
+    levelData->m_featured = featuredScore;
+    levelData->m_isEpic = isEpic;
+
+    if (isCustomSong) levelData->m_songID = songID;
+    levelData->m_audioTrack = songID;
+
+    return levelData;
 }

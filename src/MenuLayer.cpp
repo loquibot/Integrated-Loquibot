@@ -10,6 +10,7 @@ class $modify(MenuLayer) {
         if (!MenuLayer::init()) return false;
 
         GlobalVars::getSharedInstance()->isSearchScene = false;
+
         auto buttonSprite = CCSprite::create("loqui.png"_spr);
 
         auto button = CCMenuItemSpriteExtra::create(buttonSprite, this,

@@ -3,6 +3,10 @@
 #ifndef __LOQUIBOT_H
 #define __LOQUIBOT_H
 
+#include <Geode/Geode.hpp>
+
+using namespace cocos2d;
+
 class Loquibot {
 protected:
     static Loquibot* instance;
@@ -17,6 +21,7 @@ public:
     void blockLevel(CCObject*);
     void blockCreator(CCObject*);
     void blockRequester(CCObject*);
+    void openLevelMenu(CCObject*);
     void operator=(const Loquibot &) = delete;
 
     static Loquibot* getSharedInstance(){

@@ -19,5 +19,7 @@ bool loquiOpen = false;
 bool isLoquiMenu = false;
 bool deleting = false;
 bool isSearchScene = false;
+bool onReqScene = false;
+matjson::Array currentLevelList;
 
 GJGameLevel* levelData = nullptr;
