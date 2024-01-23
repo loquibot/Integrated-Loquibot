@@ -55,8 +55,8 @@ class $modify(LevelCell){
 
         if(isRequest && isLevelRequestsScene()){
             GlobalVars::getSharedInstance()->currentID = m_level->m_levelID;
+            ServerListener::sendMessage(fmt::format("set_pos {}", getLevelPos(m_level->m_levelID)));
         }
-        ServerListener::sendMessage(fmt::format("set_pos {}", getLevelPos(m_level->m_levelID)));
         LevelCell::onClick(obj);
     }
 
