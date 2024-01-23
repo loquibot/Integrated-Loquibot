@@ -1,9 +1,11 @@
 #include "RequestsLayer.h"
 #include "GlobalVars.h"
+#include "ServerListener.h"
+#include "ClearAlertProtocol.h"
 
-RequestsLayer* RequestsLayer::create(CCArray* levels) {
+RequestsLayer* RequestsLayer::create(CCArray* levels, bool queueEnabled) {
     auto ret = new RequestsLayer();
-    if (ret && ret->init(levels)) {
+    if (ret && ret->init(levels, queueEnabled)) {
         ret->autorelease();
     } else {
         delete ret;
@@ -12,9 +14,10 @@ RequestsLayer* RequestsLayer::create(CCArray* levels) {
     return ret;
 }
 
-bool RequestsLayer::init(CCArray* levels) {
+bool RequestsLayer::init(CCArray* levels, bool queueEnabled) {
 
     GlobalVars::getSharedInstance()->onReqScene = true;
+    m_currentLayer = this;
 
     auto backgroundSprite = CCSprite::create("GJ_gradientBG.png");
     
@@ -85,6 +88,27 @@ bool RequestsLayer::init(CCArray* levels) {
     levelRequestsLabel->setPosition({winSize.width/2, winSize.height - 28});
     levelRequestsLabel->setScale(0.8f);
 
+    float menuWidth = 60.0f;
+
+    m_toggleQueue = CCMenuItemToggler::createWithSize("GJ_pauseEditorBtn_001.png","GJ_playEditorBtn_001.png", this, menu_selector(RequestsLayer::runToggle), 1.0f);
+    m_toggleQueue->setPosition({menuWidth/2, winSize.height/2+24});
+    m_toggleQueue->toggle(!queueEnabled);
+
+    CCSprite* clearSprite = CCSprite::createWithSpriteFrameName("GJ_trashBtn_001.png");
+    clearSprite->setScale(0.8f);
+    CCMenuItemSpriteExtra* clearQueue = CCMenuItemSpriteExtra::create(clearSprite, this, menu_selector(RequestsLayer::runClear));
+    clearQueue->setPosition({menuWidth/2, winSize.height/2-24});
+
+    CCMenu* rightMenu = CCMenu::create();
+    rightMenu->setContentSize({menuWidth, winSize.height});
+    rightMenu->setPosition({winSize.width, 0});
+    rightMenu->ignoreAnchorPointForPosition(false);
+    rightMenu->setAnchorPoint({1, 0});
+
+    rightMenu->addChild(clearQueue);
+    rightMenu->addChild(m_toggleQueue);
+
+    addChild(rightMenu);
     addChild(listLayer);
     addChild(levelRequestsLabel);
 
@@ -102,12 +126,31 @@ void RequestsLayer::keyBackClicked() {
 
 void RequestsLayer::onBack(CCObject* object) {
     GlobalVars::getSharedInstance()->onReqScene = false;
+    m_currentLayer = nullptr;
     keyBackClicked();
 }
 
-CCScene* RequestsLayer::scene(CCArray* levels) {
-    auto layer = RequestsLayer::create(levels);
+CCScene* RequestsLayer::scene(CCArray* levels, bool queueEnabled) {
+    auto layer = RequestsLayer::create(levels, queueEnabled);
     auto scene = CCScene::create();
     scene->addChild(layer);
     return scene;
+}
+
+void RequestsLayer::updateToggle(bool enabled){
+    m_toggleQueue->toggle(!enabled);
+}
+
+void RequestsLayer::runToggle(CCObject* obj){
+    ServerListener::sendMessage("toggle");
+}
+
+void RequestsLayer::runClear(CCObject* obj){
+    auto alertLayer = FLAlertLayer::create(new ClearAlertProtocol, "Clear the queue?", "This will remove <cr>all</c> the levels from the queue!", "Cancel", "Okay", 300);
+    alertLayer->show();
+}
+
+RequestsLayer* RequestsLayer::m_currentLayer = nullptr;
+RequestsLayer* RequestsLayer::get(){
+    return m_currentLayer;
 }

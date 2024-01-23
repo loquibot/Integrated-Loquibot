@@ -20,6 +20,8 @@ bool isLoquiMenu = false;
 bool deleting = false;
 bool isSearchScene = false;
 bool onReqScene = false;
+int idWithYouTube = -1;
+
 matjson::Array currentLevelList;
 
 GJGameLevel* levelData = nullptr;

@@ -15,6 +15,8 @@
 #include "GlobalVars.h"
 #include "RequestsLayer.h"
 #include "GJGameLevel.h"
+#include "HelpAlertProtocol.h"
+#include "YouTubeMenu.h"
 
 using namespace cocos2d;
 
@@ -86,6 +88,11 @@ void ServerListener::onMessage(std::string message) {
                 CCArray* arr = CCArray::create();
 
                 matjson::Array levelArray = levelJson["levels"].as_array();
+                bool levelsEnabled = true;
+                if(levelJson.contains("levels_enabled")){
+                    levelsEnabled = levelJson["levels_enabled"].as_bool();
+                }
+
                 for (int i = 0; i < levelArray.size(); i++){
 
                     GJGameLevel* level = parseJsonToGameLevel(levelArray.at(i));
@@ -96,11 +103,41 @@ void ServerListener::onMessage(std::string message) {
 
                 GlobalVars::getSharedInstance()->currentLevelList = levelArray;
 
-                CCScene* scene = RequestsLayer::scene(arr);
+                CCScene* scene = RequestsLayer::scene(arr, levelsEnabled);
 
                 auto transition = CCTransitionFade::create(0.5f, scene);
             
                 CCDirector::sharedDirector()->pushScene(transition);
+
+            }
+            if(type == "update_toggle"){
+                bool levelsEnabled = levelJson["levels_enabled"].as_bool();
+                RequestsLayer* reqLayer = RequestsLayer::get();
+                if(reqLayer){
+                    reqLayer->updateToggle(levelsEnabled);
+                }
+            }
+            if(type == "youtube_info"){
+                std::string videoTitle = levelJson["title"].as_string();
+                std::string videoCreator = levelJson["creator"].as_string();
+                std::string videoViews = levelJson["views"].as_string();
+                std::string videoID = levelJson["id"].as_string();
+
+                std::string thumbnailURL = fmt::format("https://img.youtube.com/vi/{}/maxresdefault.jpg", videoID);
+                std::string videoURL = fmt::format("https://www.youtube.com/watch?v={}", videoID);
+
+                YouTubeMenu* menu = YouTubeMenu::create(thumbnailURL, videoTitle, videoCreator, videoViews, videoURL);
+                menu->show();
+            }
+            if(type == "has_youtube"){
+                int id = levelJson["id"].as_int();
+                CCLayer* levelInfoLayer = GlobalVars::getSharedInstance()->lastLayer;
+                if(levelInfoLayer){
+                    if(((LevelInfoLayer*)levelInfoLayer)->m_level->m_levelID == id){
+                        GlobalVars::getSharedInstance()->idWithYouTube = id;
+                        Loquibot::getSharedInstance()->showYouTube();
+                    }
+                }
 
             }
             return;
@@ -133,7 +170,7 @@ void ServerListener::onMessage(std::string message) {
                 }
 
                 if(badUpdate){
-                    auto alertLayer = FLAlertLayer::create(nullptr, "Bad Version!", "Your Loquibot App is out of date!\nGo to <cg>loquibot.com/versionHelp.html</c> for more info.", "Okay", nullptr, 300);
+                    auto alertLayer = FLAlertLayer::create(new HelpAlertProtocol, "Bad Version!", "Your Loquibot App is out of date!\nClick <cg>Help</c> for more info.", "Okay", "Help", 300);
                     alertLayer->show();
                     return;
                 }
@@ -243,8 +280,7 @@ void ServerListener::onMessage(std::string message) {
                 }
                 auto requesterLabel = reinterpret_cast<CCLabelBMFont*>(layer->getChildByTag(357832));
 
-                requesterLabel->setColor(ccGREEN);
-                requesterLabel->setString(("Sent By " + requester).c_str());
+                requesterLabel->setString(("Requested by " + requester).c_str());
 
                 auto winSize = CCDirector::sharedDirector()->getWinSize();
 
@@ -311,7 +347,9 @@ GJGameLevel* parseJsonToGameLevel(matjson::Value levelJson){
     levelData->m_levelName = name;
     levelData->m_creatorName = creator;
 
-    levelData->m_difficulty = (GJDifficulty) (difficulty-1);
+    if(difficulty > 0){
+        levelData->m_difficulty = (GJDifficulty) (difficulty-1);
+    }
 
     int demonDifficultyValue = 0;
 
@@ -350,3 +388,5 @@ GJGameLevel* parseJsonToGameLevel(matjson::Value levelJson){
 
     return levelData;
 }
+
+

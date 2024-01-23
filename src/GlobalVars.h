@@ -28,6 +28,8 @@ public:
     bool isSearchScene;
     bool isViewer;
     bool onReqScene;
+    int idWithYouTube;
+
     matjson::Array currentLevelList;
 
     static GlobalVars* getSharedInstance(){

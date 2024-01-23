@@ -22,8 +22,10 @@ public:
     void blockCreator(CCObject*);
     void blockRequester(CCObject*);
     void openLevelMenu(CCObject*);
+    void openYoutube(CCObject*);
+    void showBlockMenu(CCObject*);
     void operator=(const Loquibot &) = delete;
-
+    void showYouTube();
     static Loquibot* getSharedInstance(){
 
         if (!instance) {

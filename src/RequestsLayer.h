@@ -6,11 +6,16 @@ using namespace geode::prelude;
 
 class RequestsLayer : public cocos2d::CCLayer {
 protected:
-    virtual bool init(CCArray* levels);
+    virtual bool init(CCArray* levels, bool levelsEnabled);
     virtual void keyBackClicked();
     void onBack(cocos2d::CCObject*);
+    void runToggle(CCObject* obj);
+    void runClear(CCObject* obj);
+    CCMenuItemToggler* m_toggleQueue;
+    static RequestsLayer* m_currentLayer;
 public:
-    static RequestsLayer* create(CCArray* levels);
-    static cocos2d::CCScene* scene(CCArray* levels);
-
+    void updateToggle(bool enabled);
+    static RequestsLayer* create(CCArray* levels, bool levelsEnabled);
+    static cocos2d::CCScene* scene(CCArray* levels, bool levelsEnabled);
+    static RequestsLayer* get();
 };

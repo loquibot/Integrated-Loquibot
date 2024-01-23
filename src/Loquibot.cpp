@@ -8,6 +8,9 @@
 #include <Geode/Geode.hpp>
 #include "RequestsLayer.h"
 #include "GJGameLevel.h"
+#include "BlockMenu.h"
+#include "YouTubeMenu.h"
+#include "LevelInfoLayer.h"
 
 using namespace cocos2d;
 
@@ -203,4 +206,44 @@ void Loquibot::openLevelMenu(CCObject*){
 
     ServerListener::sendMessage("list_get");
     
+}
+
+void Loquibot::openYoutube(CCObject*){
+
+    ServerListener::sendMessage("get_selected_yt");
+}
+
+void Loquibot::showBlockMenu(CCObject*){
+
+    BlockMenu* menu = BlockMenu::create();
+    menu->show();
+
+}
+
+void Loquibot::showYouTube(){
+
+    CCLayer* thisLayer = GlobalVars::getSharedInstance()->lastLayer;
+
+    if(thisLayer){
+
+        auto winSize = CCDirector::sharedDirector()->getWinSize();
+
+        CCNode* title = thisLayer->getChildByID("title-label");
+
+        float titleWidth = title->getContentSize().width;
+
+        auto youtubeButtonSprite = CCSprite::createWithSpriteFrameName("gj_ytIcon_001.png");
+        auto youtubeButton = CCMenuItemSpriteExtra::create(youtubeButtonSprite, thisLayer,
+            menu_selector(Loquibot::openYoutube));
+        youtubeButton->ignoreAnchorPointForPosition(true);
+
+        CCMenu* youtubeButtonMenu = CCMenu::create();
+        youtubeButtonMenu->setContentSize({30,30});
+        youtubeButtonMenu->ignoreAnchorPointForPosition(false);
+        youtubeButtonMenu->setPosition({title->getPositionX() + (titleWidth * title->getScaleX())/2.0f + 20, title->getPositionY()-2});
+        youtubeButtonMenu->setScale(0.5f);
+        youtubeButtonMenu->addChild(youtubeButton);
+
+        thisLayer->addChild(youtubeButtonMenu);
+    }
 }
