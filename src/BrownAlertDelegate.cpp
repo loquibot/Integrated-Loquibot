@@ -49,6 +49,8 @@ bool BrownAlertDelegate::init(float w, float h, const char* spr, const char* tit
     this->setKeypadEnabled(true);
     this->setTouchEnabled(true);
 
+    cocos2d::CCTouchDispatcher::get()->registerForcePrio(this, 2);
+
     return true;
 }
 

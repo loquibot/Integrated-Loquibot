@@ -22,6 +22,10 @@ class BrownAlertDelegate : public FLAlertLayer {
         virtual void keyDown(cocos2d::enumKeyCodes) override;
 
         virtual void onClose(cocos2d::CCObject*);
+
+        ~BrownAlertDelegate() override {
+            cocos2d::CCTouchDispatcher::get()->unregisterForcePrio(this);
+        }
 };
 
 #endif

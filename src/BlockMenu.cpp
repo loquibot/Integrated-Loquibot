@@ -1,5 +1,6 @@
 #include "BlockMenu.h"
 #include "Loquibot.h"
+#include <Geode/Geode.hpp>
 
 void BlockMenu::setup() {
     
