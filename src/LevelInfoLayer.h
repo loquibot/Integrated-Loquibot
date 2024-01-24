@@ -21,7 +21,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
         if (level->m_levelID == GlobalVars::getSharedInstance()->currentID) {
-			GlobalVars::getSharedInstance()->lastLayer = this;
+
             try {
                 GlobalVars::getSharedInstance()->isLoquiMenu = true;
 
@@ -168,7 +168,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 }
 
                 if(level->m_levelID == GlobalVars::getSharedInstance()->idWithYouTube){
-                    Loquibot::getSharedInstance()->showYouTube();
+                    Loquibot::getSharedInstance()->showYouTube(this);
                 }
 
                 fixLevelInfoSize();
@@ -210,7 +210,6 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 
             }
 			GlobalVars::getSharedInstance()->currentID = -1;
-            GlobalVars::getSharedInstance()->lastLayer = nullptr;
 
         }
         else {

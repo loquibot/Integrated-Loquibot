@@ -55,9 +55,11 @@ void hideButtons(CCObject* obj) {
     }
 }
 
-void Loquibot::showButtons(CCObject* obj) {
+void Loquibot::showButtons() {
 
-    CCLayer* layer = reinterpret_cast<CCLayer*>(obj);
+    CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+
+	LevelInfoLayer* layer = dynamic_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
     
     if(layer){
 
@@ -220,20 +222,18 @@ void Loquibot::showBlockMenu(CCObject*){
 
 }
 
-void Loquibot::showYouTube(){
+void Loquibot::showYouTube(LevelInfoLayer* LevelInfoLayer){
 
-    CCLayer* thisLayer = GlobalVars::getSharedInstance()->lastLayer;
-
-    if(thisLayer){
+    if(LevelInfoLayer){
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        CCNode* title = thisLayer->getChildByID("title-label");
+        CCNode* title = LevelInfoLayer->getChildByID("title-label");
 
         float titleWidth = title->getContentSize().width;
 
         auto youtubeButtonSprite = CCSprite::createWithSpriteFrameName("gj_ytIcon_001.png");
-        auto youtubeButton = CCMenuItemSpriteExtra::create(youtubeButtonSprite, thisLayer,
+        auto youtubeButton = CCMenuItemSpriteExtra::create(youtubeButtonSprite, LevelInfoLayer,
             menu_selector(Loquibot::openYoutube));
         youtubeButton->ignoreAnchorPointForPosition(true);
 
@@ -244,6 +244,6 @@ void Loquibot::showYouTube(){
         youtubeButtonMenu->setScale(0.5f);
         youtubeButtonMenu->addChild(youtubeButton);
 
-        thisLayer->addChild(youtubeButtonMenu);
+        LevelInfoLayer->addChild(youtubeButtonMenu);
     }
 }

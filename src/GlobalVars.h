@@ -12,7 +12,6 @@ protected:
     static GlobalVars* instance;
 public:
     GJGameLevel* levelData;
-    cocos2d::CCLayer* lastLayer;
 
     std::string creator;
     std::string requester;

@@ -11,7 +11,7 @@ class Loquibot {
 protected:
     static Loquibot* instance;
 public:
-    void showButtons(CCObject*);
+    void showButtons();
     void goToLevel(CCObject*);
     void goToNextLevel(CCObject*);
     void goToTopLevel(CCObject*);
@@ -25,7 +25,7 @@ public:
     void openYoutube(CCObject*);
     void showBlockMenu(CCObject*);
     void operator=(const Loquibot &) = delete;
-    void showYouTube();
+    void showYouTube(LevelInfoLayer* LevelInfoLayer);
     static Loquibot* getSharedInstance(){
 
         if (!instance) {

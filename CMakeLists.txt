@@ -16,10 +16,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
     -DWIN32_LEAN_AND_MEAN=1 -DNOMINMAX=1 -D_WINSOCKAPI_=1 -DPSAPI_VERSION=1
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-  libraries/rapidjson
-)
-
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
 else()

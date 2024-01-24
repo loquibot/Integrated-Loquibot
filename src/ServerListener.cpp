@@ -131,11 +131,15 @@ void ServerListener::onMessage(std::string message) {
             }
             if(type == "has_youtube"){
                 int id = levelJson["id"].as_int();
-                CCLayer* levelInfoLayer = GlobalVars::getSharedInstance()->lastLayer;
+
+                CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+
+				LevelInfoLayer* levelInfoLayer = dynamic_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
+
                 if(levelInfoLayer){
                     if(((LevelInfoLayer*)levelInfoLayer)->m_level->m_levelID == id){
                         GlobalVars::getSharedInstance()->idWithYouTube = id;
-                        Loquibot::getSharedInstance()->showYouTube();
+                        Loquibot::getSharedInstance()->showYouTube(levelInfoLayer);
                     }
                 }
 
@@ -195,7 +199,7 @@ void ServerListener::onMessage(std::string message) {
                         auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
                         alertLayer->show();
 
-                        Loquibot::getSharedInstance()->showButtons(GlobalVars::getSharedInstance()->lastLayer);
+                        Loquibot::getSharedInstance()->showButtons();
 
                         return;
                     }
