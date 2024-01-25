@@ -17,7 +17,6 @@ RequestsLayer* RequestsLayer::create(CCArray* levels, bool queueEnabled) {
 bool RequestsLayer::init(CCArray* levels, bool queueEnabled) {
 
     GlobalVars::getSharedInstance()->onReqScene = true;
-    m_currentLayer = this;
 
     auto backgroundSprite = CCSprite::create("GJ_gradientBG.png");
     
@@ -126,7 +125,6 @@ void RequestsLayer::keyBackClicked() {
 
 void RequestsLayer::onBack(CCObject* object) {
     GlobalVars::getSharedInstance()->onReqScene = false;
-    m_currentLayer = nullptr;
     keyBackClicked();
 }
 
@@ -148,9 +146,4 @@ void RequestsLayer::runToggle(CCObject* obj){
 void RequestsLayer::runClear(CCObject* obj){
     auto alertLayer = FLAlertLayer::create(new ClearAlertProtocol, "Clear the queue?", "This will remove <cr>all</c> the levels from the queue!", "Cancel", "Okay", 300);
     alertLayer->show();
-}
-
-RequestsLayer* RequestsLayer::m_currentLayer = nullptr;
-RequestsLayer* RequestsLayer::get(){
-    return m_currentLayer;
 }

@@ -12,10 +12,8 @@ protected:
     void runToggle(CCObject* obj);
     void runClear(CCObject* obj);
     CCMenuItemToggler* m_toggleQueue;
-    static RequestsLayer* m_currentLayer;
 public:
     void updateToggle(bool enabled);
     static RequestsLayer* create(CCArray* levels, bool levelsEnabled);
     static cocos2d::CCScene* scene(CCArray* levels, bool levelsEnabled);
-    static RequestsLayer* get();
 };

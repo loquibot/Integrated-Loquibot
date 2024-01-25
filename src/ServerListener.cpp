@@ -112,10 +112,15 @@ void ServerListener::onMessage(std::string message) {
             }
             if(type == "update_toggle"){
                 bool levelsEnabled = levelJson["levels_enabled"].as_bool();
-                RequestsLayer* reqLayer = RequestsLayer::get();
+
+                CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+
+				RequestsLayer* reqLayer = dynamic_cast<RequestsLayer*>(currentScene->getChildren()->objectAtIndex(0));
+
                 if(reqLayer){
                     reqLayer->updateToggle(levelsEnabled);
                 }
+
             }
             if(type == "youtube_info"){
                 std::string videoTitle = levelJson["title"].as_string();
