@@ -78,7 +78,7 @@ bool RequestsLayer::init(CCArray* levels, bool queueEnabled) {
     CustomListView* customListView = CustomListView::create(levels, nullptr, 240, 356, 0, BoomListType::Level4, 0);
 
     GJListLayer* listLayer = GJListLayer::create(customListView, "", {191, 114, 62, 255}, 356, 240, 1);
-    listLayer->setTag(736357);
+    listLayer->setID("list-layer"_spr);
     listLayer->setAnchorPoint({0.5, 0.5});
     listLayer->ignoreAnchorPointForPosition(false);
     listLayer->setPosition(winSize.width/2, winSize.height/2 - 5);

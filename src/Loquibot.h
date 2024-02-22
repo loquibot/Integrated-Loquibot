@@ -24,6 +24,7 @@ public:
     void openLevelMenu(CCObject*);
     void openYoutube(CCObject*);
     void showBlockMenu(CCObject*);
+    void copyRequesterName(CCObject*);
     void operator=(const Loquibot &) = delete;
     void showYouTube(LevelInfoLayer* LevelInfoLayer);
     static Loquibot* getSharedInstance(){

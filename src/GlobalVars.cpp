@@ -3,4 +3,3 @@
 #include "GlobalVars.h"
 
 GlobalVars* GlobalVars::instance = nullptr;
-

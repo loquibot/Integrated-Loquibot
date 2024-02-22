@@ -39,7 +39,7 @@ class $modify(LevelCell){
             CCMenuItemSpriteExtra* viewButton = m_button;
             viewButton->removeAllChildren();
             viewButton->setContentSize({30, 30});
-            viewButton->setPosition({45, -135});
+            viewButton->setPosition({viewButton->getPositionX()+15, viewButton->getPositionY()+1});
 
             CCSprite* playSprite = CCSprite::createWithSpriteFrameName("GJ_playBtn2_001.png");
             playSprite->setAnchorPoint({0, 0});

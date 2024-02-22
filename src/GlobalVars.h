@@ -12,12 +12,9 @@ protected:
     static GlobalVars* instance;
 public:
     GJGameLevel* levelData;
-
     std::string creator;
     std::string requester;
-    int accountID;
     int currentID;
-
     bool isEmpty;
     bool isStartLevel;
     bool isButtonPressed;

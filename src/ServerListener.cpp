@@ -219,16 +219,19 @@ void ServerListener::onMessage(std::string message) {
 
                 name = levelJson["name"].as_string();
                 creator =  levelJson["creator"].as_string();
-                GlobalVars::getSharedInstance()->creator = creator;
-
                 requester = levelJson["requester"].as_string();
+
                 GlobalVars::getSharedInstance()->requester = requester;
 
                 int ID = levelJson["id"].as_int();
                 int songID = levelJson["songID"].as_int();
 
                 int accountID = levelJson["accountID"].as_int();
-                GlobalVars::getSharedInstance()->accountID = accountID;
+
+                if (levelJson.contains("userID")) {
+                    int userID = levelJson["userID"].as_int();
+                    GameLevelManager::sharedState()->storeUserName(userID, accountID, creator);
+                }
 
                 bool isCustomSong = levelJson["isCustomSong"].as_bool();
                 int likes = levelJson["likes"].as_int();
@@ -249,13 +252,8 @@ void ServerListener::onMessage(std::string message) {
 
                 if (level != nullptr) GlobalVars::getSharedInstance()->levelData = reinterpret_cast<GJGameLevel*>(level);
                 else {
-
-
                     GlobalVars::getSharedInstance()->levelData = GJGameLevel::create();
-
                     GJGameLevel* levelData = GlobalVars::getSharedInstance()->levelData;
-
-                    levelData->m_accountID = accountID;
                     levelData->m_levelID = ID;
                 }
 
@@ -266,6 +264,7 @@ void ServerListener::onMessage(std::string message) {
 
                 levelData->m_levelName = name;
                 levelData->m_creatorName = creator;
+                levelData->m_accountID = accountID;
 
                 levelData->m_likes = likes;
                 levelData->m_downloads = downloads;
@@ -287,13 +286,14 @@ void ServerListener::onMessage(std::string message) {
                     levelData->m_levelNotDownloaded = true;
                     layer->downloadLevel();
                 }
-                auto requesterLabel = reinterpret_cast<CCLabelBMFont*>(layer->getChildByTag(357832));
+                auto requesterLabel = reinterpret_cast<CCLabelBMFont*>(layer->getChildByIDRecursive("requester-label"_spr));
+                auto requesterButton = reinterpret_cast<CCMenuItemSpriteExtra*>(layer->getChildByIDRecursive("requester-button"_spr));
 
                 requesterLabel->setString(("Requested by " + requester).c_str());
 
                 auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-                requesterLabel->setPosition({ winSize.width / 2,
+                requesterButton->setPosition({ winSize.width / 2,
                     winSize.height - 60 });
 
                 auto scene = CCScene::create();
@@ -342,6 +342,12 @@ GJGameLevel* parseJsonToGameLevel(matjson::Value levelJson){
     int demonDifficulty = levelJson["demonDifficulty"].as_int();
     int stars = levelJson["stars"].as_int();
 
+
+    if (levelJson.contains("userID")) {
+        int userID = levelJson["userID"].as_int();
+        GameLevelManager::sharedState()->storeUserName(userID, accountID, creator);
+    }
+
     GJGameLevel* levelData = GJGameLevel::create();
 
     ((LoquiGJGameLevel*)levelData)->m_fields->m_requester = requester;
@@ -350,6 +356,8 @@ GJGameLevel* parseJsonToGameLevel(matjson::Value levelJson){
     levelData->m_levelIndex = pos;
     levelData->m_accountID = accountID;
     levelData->m_levelID = ID;
+
+    //todo make loquibot app send user ID
 
     levelData->m_levelType = (GJLevelType) 4;
     

@@ -26,22 +26,17 @@ void hideButtons(CCObject* obj) {
     
     auto menu = button->getParent();
     if(menu){
-        if (menu->getTag() == 4324) {
-            menu = menu->getParent();
-        }
+        if (menu->getID() == "main-button-menu"_spr || menu->getID() == "top-button-menu"_spr) {
 
-        if (menu->getTag() == 4323) {
-
-            menu->setVisible(false);
+            menu->getParent()->getChildByID("main-button-menu"_spr)->setVisible(false);
+            menu->getParent()->getChildByID("top-button-menu"_spr)->setVisible(false);
 
             auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-
             CCSprite* loadingSprite = CCSprite::create("loadingCircle.png");
 
-
             loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 70 });
-            loadingSprite->setTag(76532);
+            loadingSprite->setID("loading_sprite"_spr);
             loadingSprite->setScale(0.5);
             loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
 
@@ -49,10 +44,17 @@ void hideButtons(CCObject* obj) {
                 CCRotateBy::create(1.0f, 360)
                 )
             );
-
             menu->getParent()->addChild(loadingSprite);
         }
     }
+}
+
+void Loquibot::copyRequesterName(CCObject* obj) {
+
+    std::string requester = GlobalVars::getSharedInstance()->requester;
+
+    clipboard::write(requester);
+
 }
 
 void Loquibot::showButtons() {
@@ -63,13 +65,14 @@ void Loquibot::showButtons() {
     
     if(layer){
 
-        auto menu = layer->getChildByTag(4323);
-
+        auto menu = layer->getChildByID("main-button-menu"_spr);
+        layer->getChildByID("top-button-menu"_spr)->setVisible(true);
+        
         if(menu){
             menu->setVisible(true);
 
-            if(menu->getParent()->getChildByTag(76532)){
-                menu->getParent()->removeChildByTag(76532);
+            if(menu->getParent()->getChildByID("loading_sprite"_spr)){
+                menu->getParent()->removeChildByID("loading_sprite"_spr);
             }
         }
     }

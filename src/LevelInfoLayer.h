@@ -27,22 +27,15 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
                 matjson::Value listLevel = getFromArray(level->m_levelID);
 
-                std::string creator;
                 std::string requester;
-                int accountID;
 
                 if(listLevel != nullptr){
-                    creator = listLevel["creator"].as_string();
-                    accountID = listLevel["accountID"].as_int();
                     requester = listLevel["requester"].as_string();
                 }
                 else{
-                    creator = GlobalVars::getSharedInstance()->creator;
-                    accountID = GlobalVars::getSharedInstance()->accountID;
                     requester = GlobalVars::getSharedInstance()->requester;
                 }
-                level->m_creatorName = creator;
-                level->m_accountID = accountID;
+                
 
                 auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
                 nextButtonSprite->setFlipX(true);
@@ -54,13 +47,13 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 auto nextButton = CCMenuItemSpriteExtra::create(nextButtonSprite, this,
                     menu_selector(Loquibot::goToNextLevel));
 
-                nextButton->setTag(1345);
+                nextButton->setID("next-button"_spr);
                 nextButton->setPosition({ buttonXPos, winSize.height / 2 + 30 });
 
                 auto topButton = CCMenuItemSpriteExtra::create(topButtonSprite, this,
                     menu_selector(Loquibot::goToTopLevel));
 
-                topButton->setTag(1348);
+                topButton->setID("top-button"_spr);
                 topButton->setPosition({ 0, 0});
 
                 auto randomButtonSprite = CCSprite::create("LB_randomBtn.png"_spr);
@@ -68,14 +61,14 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 randomButtonSprite->setScale(0.9);
                 auto randomButton = CCMenuItemSpriteExtra::create(randomButtonSprite, this,
                     menu_selector(Loquibot::goToRandomLevel));
-                randomButton->setTag(1346);
+                randomButton->setID("random-button"_spr);
                 randomButton->setPosition({ buttonXPos, winSize.height / 2 - 20 });
 
                 auto undoButtonSprite = CCSprite::createWithSpriteFrameName("GJ_undoBtn_001.png");
                 undoButtonSprite->setScale(0.9f);
                 auto undoButton = CCMenuItemSpriteExtra::create(undoButtonSprite, this,
                     menu_selector(Loquibot::goToUndoLevel));
-                undoButton->setTag(1347);
+                undoButton->setID("undo-button"_spr);
                 undoButton->setPosition({ 80, winSize.height / 2 + 30 });
 
                 auto blockButtonSprite = CCSprite::create("LB_blockLevelBtn.png"_spr);
@@ -95,15 +88,24 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
                 requesterLabel->setString(("Requested by " + requester).c_str());
                 requesterLabel->setOpacity(175);
-                requesterLabel->setPosition({ winSize.width / 2, winSize.height - 60 });
                 requesterLabel->setZOrder(10);
                 requesterLabel->setScale(0.5f);
-                requesterLabel->setTag(357832);
-                this->addChild(requesterLabel);
+                requesterLabel->setID("requester-label"_spr);
 
+                auto requesterMenu = CCMenu::create();
+
+                CCMenuItemSpriteExtra* requesterButton = CCMenuItemSpriteExtra::create(requesterLabel, requesterMenu, menu_selector(Loquibot::copyRequesterName));
+                requesterButton->setPosition({ winSize.width / 2, winSize.height - 60 });
+                requesterButton->setID("requester-button"_spr);
+
+                requesterMenu->addChild(requesterButton);
+                requesterMenu->ignoreAnchorPointForPosition(false);
+                requesterMenu->setID("requester-menu"_spr);
+
+                this->addChild(requesterMenu);
 
                 auto menu = CCMenu::create();
-                menu->setTag(4323);
+                menu->setID("main-button-menu"_spr);
                 menu->setScale(0.8f);
                 menu->setAnchorPoint({1, 0.5});
                 auto actionButtonMenu = CCMenu::create();
@@ -114,16 +116,12 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
                 auto topButtonMenu = CCMenu::create();
 
-                topButtonMenu->setPosition({buttonXPos - 54, winSize.height / 2 + 168 }); //469, 240
+                topButtonMenu->setPosition({buttonXPos - 24, winSize.height - 20}); //469, 240
 				topButtonMenu->setContentSize({0, 0});
                 topButtonMenu->setScale(0.5f);
-                topButtonMenu->setTag(4324);
+                topButtonMenu->setID("top-button-menu"_spr);
 
                 topButtonMenu->addChild(topButton);
-
-                //actionButtonMenu->addChild(blockButton);
-                //actionButtonMenu->addChild(blockUserButton);
-                //actionButtonMenu->addChild(blockCreatorButton);
 
                 actionButtonMenu->setContentSize({ 0,0 });
 
@@ -131,7 +129,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 actionButtonMenu->setScale(0.5f);
 
                 menu->setPosition({ 0,0 });
-                menu->addChild(topButtonMenu);
+                this->addChild(topButtonMenu);
 
 				CCMenu* otherMenu = dynamic_cast<CCMenu*>(this->getChildByID("other-menu"));
 
