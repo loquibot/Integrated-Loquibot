@@ -55,6 +55,7 @@ void ServerListener::connect(){
             ws->dispatch([wsp](const std::string& message) {
                 onMessage(message);
                 });
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
 
