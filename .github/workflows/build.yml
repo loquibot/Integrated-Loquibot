@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "main"
+      - '**'
 
 jobs:
   build:
@@ -14,7 +14,7 @@ jobs:
         config:
         - name: Windows
           os: windows-latest
-          
+
         - name: macOS
           os: macos-latest
 
@@ -26,17 +26,20 @@ jobs:
 
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
+        
         with:
+          sdk: latest
           combine: true
-          cli: v2.5.0
-          sdk: stable
+          target: ${{ matrix.config.target }}
+          bindings: Alphalaneous/bindings
+      
   package:
-    name: Package both builds
+    name: Package builds
     runs-on: ubuntu-latest
     needs: ['build']
 
     steps:
-      - uses: geode-sdk/build-geode-mod/@combine
+      - uses: geode-sdk/build-geode-mod@combine
         id: build
 
       - uses: actions/upload-artifact@v3
