@@ -28,6 +28,7 @@ class $modify(FLAlertLayer) {
         this->m_fields->m_height = p7;
         this->m_fields->m_textScale = p8;
         
+
         return FLAlertLayer::init(p0, p1, p2, p3, p4, p5, p6, p7, p8);
     }
 
@@ -86,7 +87,7 @@ class $modify(FLAlertLayer) {
 
         //fix crash if vanilla alert protocol is nullptr
         
-        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault) {
+        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->getID() == "ShareCommentLayer") {
             nextScene->addChild(this, zOrder);
 
             this->setOpacity(0);
@@ -94,8 +95,13 @@ class $modify(FLAlertLayer) {
             fadeTo = CCFadeTo::create(0.14, opacity);
             this->runAction(fadeTo);
             this->setKeypadEnabled(true);
+            return;
         }
         
+
+        log::info("{}", this->getID());
+
+
         if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
             geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
         }
