@@ -7,8 +7,27 @@ class $modify(FLAlertLayer) {
 
     bool m_isDefault = false;
 
+    char const* m_title;
+    std::string m_desc;
+    char const* m_btn1;
+    char const* m_btn2;
+    float m_width;
+    bool m_scroll;
+    float m_height;
+    float m_textScale;
+
+
     bool init(FLAlertLayerProtocol* p0, char const* p1, gd::string p2, char const* p3, char const* p4, float p5, bool p6, float p7, float p8) {
         this->m_fields->m_isDefault = true;
+        this->m_fields->m_title = p1;
+        this->m_fields->m_desc = p2;
+        this->m_fields->m_btn1 = p3;
+        this->m_fields->m_btn2 = p4;
+        this->m_fields->m_width = p5;
+        this->m_fields->m_scroll = p6;
+        this->m_fields->m_height = p7;
+        this->m_fields->m_textScale = p8;
+        
         return FLAlertLayer::init(p0, p1, p2, p3, p4, p5, p6, p7, p8);
     }
 
@@ -75,6 +94,10 @@ class $modify(FLAlertLayer) {
             fadeTo = CCFadeTo::create(0.14, opacity);
             this->runAction(fadeTo);
             this->setKeypadEnabled(true);
+        }
+        
+        if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
+            geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
         }
 	}
 };
