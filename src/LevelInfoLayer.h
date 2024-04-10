@@ -214,10 +214,15 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
         }
     }
 
-    void onDelete(CCObject* object) {
-        GlobalVars::getSharedInstance()->deleting = true;
-        LevelInfoLayer::onDelete(object);
+
+    void FLAlert_Clicked(FLAlertLayer* p0, bool p1){
+
+        if(p0->getTag() == 4 && p1){ //onDelete
+            GlobalVars::getSharedInstance()->deleting = true;
+        }
+        LevelInfoLayer::FLAlert_Clicked(p0, p1);
     }
+
 
     void fixLevelInfoSize(){
         CCSprite* lengthIcon = dynamic_cast<CCSprite*>(this->getChildByID("length-icon"));
