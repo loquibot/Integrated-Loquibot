@@ -7,7 +7,13 @@
 
 #include <Geode/modify/LevelSearchLayer.hpp>
 
+using namespace geode::prelude;
+
 class $modify(LevelSearchLayer) {
+
+    static void onModify(auto& self) {
+        (void) self.setHookPriority("LevelSearchLayer::init", -1024);
+    }
 
     bool init(int a1) {
 
@@ -22,15 +28,16 @@ class $modify(LevelSearchLayer) {
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        button->setPosition({ winSize.width - 24, winSize.height - 170 });
-
-        auto menu = CCMenu::create();
+        auto menu = this->getChildByID("other-filter-menu");
         menu->addChild(button);
 
-        menu->setPosition({ 0,0 });
+        auto lastButton = menu->getChildByID("lists-button");
 
-        this->addChild(menu);
+        if(Loader::get()->isModLoaded("b1rtek.gddlintegration")){
+            lastButton = menu->getChildByID("b1rtek.gddlintegration/gddl_search_button");
+        }
 
+        button->setPosition({lastButton->getPositionX() + 1, lastButton->getPositionY() - 50});
 
 
         return true;

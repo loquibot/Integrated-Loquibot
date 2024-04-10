@@ -140,19 +140,18 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
                 CCMenu* backMenu = dynamic_cast<CCMenu*>(this->getChildByID("back-menu"));
                 auto levelListSprite = CCSprite::createWithSpriteFrameName("GJ_menuBtn_001.png");
+                levelListSprite->setScale(0.60f);
 
-                CCMenuItemSpriteExtra* button = CCMenuItemSpriteExtra::create(levelListSprite, this, menu_selector(Loquibot::openLevelMenu));
+                CCMenuItemSpriteExtra* levelListButton = CCMenuItemSpriteExtra::create(levelListSprite, this, menu_selector(Loquibot::openLevelMenu));
+                levelListButton->setID("level-list-button"_spr);
 
-                CCMenu* childMenu = CCMenu::create();
-                childMenu->setContentSize({30,30});
-                childMenu->setPosition({56, 14});
-                undoButton->setPosition({105, 20});
+                //levelListButton->setPosition({75, 20});
+                //undoButton->setPosition({105, 20});
 
-                childMenu->setScale(0.6f);
-                childMenu->addChild(button);
-
-                backMenu->addChild(childMenu);
+                backMenu->addChild(levelListButton);
                 backMenu->addChild(undoButton);
+
+                backMenu->updateLayout();
 
                 this->addChild(menu);
                 this->addChild(actionButtonMenu);
