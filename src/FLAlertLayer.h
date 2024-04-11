@@ -3,9 +3,11 @@
 
 using namespace geode::prelude;
 
+
 class $modify(FLAlertLayer) {
 
-    bool m_isDefault = false;
+    bool m_isDefault;
+    bool m_isSpecial;
 
     char const* m_title;
     std::string m_desc;
@@ -16,9 +18,10 @@ class $modify(FLAlertLayer) {
     float m_height;
     float m_textScale;
 
-
     bool init(FLAlertLayerProtocol* p0, char const* p1, gd::string p2, char const* p3, char const* p4, float p5, bool p6, float p7, float p8) {
         this->m_fields->m_isDefault = true;
+        this->m_fields->m_isSpecial = !p1;
+
         this->m_fields->m_title = p1;
         this->m_fields->m_desc = p2;
         this->m_fields->m_btn1 = p3;
@@ -28,9 +31,9 @@ class $modify(FLAlertLayer) {
         this->m_fields->m_height = p7;
         this->m_fields->m_textScale = p8;
         
-
         return FLAlertLayer::init(p0, p1, p2, p3, p4, p5, p6, p7, p8);
     }
+
 
 	void show() {
         
@@ -87,7 +90,7 @@ class $modify(FLAlertLayer) {
 
         //fix crash if vanilla alert protocol is nullptr
         
-        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || reinterpret_cast<ShareCommentLayer*>(this) || reinterpret_cast<MoreSearchLayer*>(this)) {
+        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->m_fields->m_isSpecial) {
             nextScene->addChild(this, zOrder);
 
             this->setOpacity(0);
@@ -97,10 +100,6 @@ class $modify(FLAlertLayer) {
             this->setKeypadEnabled(true);
             return;
         }
-        
-
-        log::info("{}", this->getID());
-
 
         if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
             geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
