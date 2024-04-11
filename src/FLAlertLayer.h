@@ -87,7 +87,7 @@ class $modify(FLAlertLayer) {
 
         //fix crash if vanilla alert protocol is nullptr
         
-        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->getID() == "ShareCommentLayer") {
+        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || reinterpret_cast<ShareCommentLayer*>(this) || reinterpret_cast<MoreSearchLayer*>(this)) {
             nextScene->addChild(this, zOrder);
 
             this->setOpacity(0);
