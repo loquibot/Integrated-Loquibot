@@ -31,13 +31,7 @@ class $modify(LevelSearchLayer) {
         auto menu = this->getChildByID("other-filter-menu");
         menu->addChild(button);
 
-        auto lastButton = menu->getChildByID("lists-button");
-
-        if(Loader::get()->isModLoaded("b1rtek.gddlintegration")){
-            lastButton = menu->getChildByID("b1rtek.gddlintegration/gddl_search_button");
-        }
-
-        button->setPosition({lastButton->getPositionX() + 1, lastButton->getPositionY() - 50});
+        menu->updateLayout();
 
 
         return true;
