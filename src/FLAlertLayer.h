@@ -91,8 +91,13 @@ class $modify(FLAlertLayer) {
 
         //fix crash if vanilla alert protocol is nullptr
         
+        bool isScroll = !!getChildByIDRecursive("scroll-layer");
+        bool hasTextArea = !!getChildByIDRecursive("content-text-area");
+        bool hasAlertProtocol = !!m_alertProtocol;
+        bool isDefault = this->m_fields->m_isDefault;
+        bool isSpecial = this->m_fields->m_isSpecial;
 
-        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->m_fields->m_isSpecial || !getChildByIDRecursive("content-text-area")) {
+        if(hasAlertProtocol || !isDefault || isSpecial || !hasTextArea || isScroll) {
             nextScene->addChild(this, zOrder);
 
             this->setOpacity(0);
