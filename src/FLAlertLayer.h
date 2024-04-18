@@ -1,5 +1,6 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
+#include "TextArea.h"
 
 using namespace geode::prelude;
 
@@ -90,7 +91,8 @@ class $modify(FLAlertLayer) {
 
         //fix crash if vanilla alert protocol is nullptr
         
-        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->m_fields->m_isSpecial) {
+
+        if(m_alertProtocol != nullptr || !this->m_fields->m_isDefault || this->m_fields->m_isSpecial || !getChildByIDRecursive("content-text-area")) {
             nextScene->addChild(this, zOrder);
 
             this->setOpacity(0);
@@ -102,6 +104,23 @@ class $modify(FLAlertLayer) {
         }
 
         if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
+
+            auto textNode = getChildByIDRecursive("content-text-area");
+            auto titleNode = getChildByIDRecursive("title");
+
+            std::string text = this->m_fields->m_desc;
+            std::string titleText = this->m_fields->m_title;
+
+            if(textNode){
+                MyTextArea* area = dynamic_cast<MyTextArea*>(textNode);
+                if(area){
+                    text = area->getString();
+                }
+            }
+            if(titleNode){
+                titleText = (dynamic_cast<CCLabelBMFont*>(titleNode))->getString();
+            }
+
             geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
         }
 	}
