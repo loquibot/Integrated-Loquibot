@@ -9,6 +9,7 @@
 	"name": "Integrated Loquibot",
 	"developer": "Alphalaneous",
 	"description": "Interact with the Loquibot Level Request bot in game.",
+	"repository": "https://github.com/loquibot/Integrated-Loquibot",
 	"dependencies": [
         {
             "id": "geode.node-ids",
