@@ -28,7 +28,7 @@ jobs:
         uses: geode-sdk/build-geode-mod@main
         
         with:
-          sdk: latest
+          sdk: nightly
           combine: true
           target: ${{ matrix.config.target }}
           bindings: Alphalaneous/bindings
