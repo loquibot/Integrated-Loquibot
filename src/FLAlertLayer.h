@@ -4,20 +4,21 @@
 
 using namespace geode::prelude;
 
-
 class $modify(FLAlertLayer) {
 
-    bool m_isDefault;
-    bool m_isSpecial;
+    struct Fields {
+        bool m_isDefault;
+        bool m_isSpecial;
 
-    char const* m_title;
-    std::string m_desc;
-    char const* m_btn1;
-    char const* m_btn2;
-    float m_width;
-    bool m_scroll;
-    float m_height;
-    float m_textScale;
+        char const* m_title;
+        std::string m_desc;
+        char const* m_btn1;
+        char const* m_btn2;
+        float m_width;
+        bool m_scroll;
+        float m_height;
+        float m_textScale;
+    };
 
     bool init(FLAlertLayerProtocol* p0, char const* p1, gd::string p2, char const* p3, char const* p4, float p5, bool p6, float p7, float p8) {
         this->m_fields->m_isDefault = true;

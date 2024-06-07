@@ -2,6 +2,8 @@
 #include "Loquibot.h"
 #include <Geode/utils/web.hpp>
 
+static std::unordered_map<std::string, web::WebTask> RUNNING_REQUESTS {};
+
 void YouTubeMenu::setup() {
 
     auto winSize = CCDirector::sharedDirector()->getWinSize();
@@ -77,36 +79,40 @@ YouTubeMenu* YouTubeMenu::create(std::string thumbnailURL, std::string videoTitl
 void YouTubeMenu::downloadImage(){
 
     YouTubeMenu* self = this;
-    web::AsyncWebRequest()
-    .fetch(m_thumbnailURL.c_str())
-    .bytes()
-    .then([self](geode::ByteVector const& response) {
-        
-        auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        CCImage* img = new CCImage();
-        img->initWithImageData((void*)response.data(), response.size());
-        img->autorelease();
+    auto req = web::WebRequest();
 
-        CCTexture2D* imgTexture = new CCTexture2D();
-        imgTexture->initWithImage(img);
-        imgTexture->autorelease();
+    RUNNING_REQUESTS.emplace("@thumbnailCheck", req.get(m_thumbnailURL.c_str())
+        .map([self](web::WebResponse* response){
+            if(response->ok()) {
+                auto winSize = CCDirector::sharedDirector()->getWinSize();
 
-        CCSprite* pSprite = CCSprite::create();
-        pSprite->initWithTexture(imgTexture);
-        pSprite->setPosition({winSize.width/2, winSize.height/2 + self->m_thumbnailTranslation});
-        
-        pSprite->setScale(self->m_scaleFactor);
-        CCScale9Sprite* border = CCScale9Sprite::create("videoBorder.png"_spr);
-        border->setContentSize({320*self->m_scaleFactor, 180*self->m_scaleFactor});
-        border->setPosition({winSize.width/2, winSize.height/2 + self->m_thumbnailTranslation});
+                CCImage* img = new CCImage();
+                img->initWithImageData((void*)response->data().data(), response->data().size());
+                img->autorelease();
 
-        
-        self->m_mainLayer->addChild(pSprite);
-        self->m_mainLayer->addChild(border);
+                CCTexture2D* imgTexture = new CCTexture2D();
+                imgTexture->initWithImage(img);
+                imgTexture->autorelease();
 
-    });
+                CCSprite* pSprite = CCSprite::create();
+                pSprite->initWithTexture(imgTexture);
+                pSprite->setPosition({winSize.width/2, winSize.height/2 + self->m_thumbnailTranslation});
+                
+                pSprite->setScale(self->m_scaleFactor);
+                CCScale9Sprite* border = CCScale9Sprite::create("videoBorder.png"_spr);
+                border->setContentSize({320*self->m_scaleFactor, 180*self->m_scaleFactor});
+                border->setPosition({winSize.width/2, winSize.height/2 + self->m_thumbnailTranslation});
 
+                self->m_mainLayer->addChild(pSprite);
+                self->m_mainLayer->addChild(border);
+            }
+
+            RUNNING_REQUESTS.erase("@thumbnailCheck");
+            return *response;
+        }
+    ));
+    
 }
 void YouTubeMenu::openURL(CCObject* obj){
 	web::openLinkInBrowser(m_videoURL);

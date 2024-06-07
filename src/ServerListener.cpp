@@ -29,7 +29,6 @@ void ServerListener::connectAsync() {
     t.detach();
 }
 
-
 void ServerListener::connect(){
 
     open();

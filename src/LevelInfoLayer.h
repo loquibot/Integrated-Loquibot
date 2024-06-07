@@ -192,8 +192,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
                 if (GlobalVars::getSharedInstance()->isSearchScene) {
 #ifdef GEODE_IS_WINDOWS
-                    auto layerSearch = LevelSearchLayer::create(0);
-                    scene->addChild(layerSearch);
+                    scene = LevelSearchLayer::scene(0);
                     auto transition = CCTransitionFade::create(0.5f, scene);
                     CCDirector::sharedDirector()->replaceScene(transition);
 #endif

@@ -7,9 +7,11 @@
 #include <Geode/modify/GJGameLevel.hpp>
 
 class $modify(LoquiGJGameLevel, GJGameLevel){
-    std::string m_requester = "";
-    bool m_isRequest = false;
 
+    struct Fields {
+        std::string m_requester = "";
+        bool m_isRequest = false;
+    };
 };
 
 #endif
