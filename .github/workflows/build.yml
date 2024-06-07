@@ -29,7 +29,7 @@ jobs:
         
         with:
           sdk: nightly
-          cli: '3.0.0-beta.1'
+          cli: 'v3.0.0-beta.1'
           combine: true
           target: ${{ matrix.config.target }}
           bindings: Alphalaneous/bindings
