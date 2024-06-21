@@ -15,24 +15,35 @@ class $modify(LevelSearchLayer) {
         (void) self.setHookPriority("LevelSearchLayer::init", -1024);
     }
 
-    bool init(int a1) {
+    bool init(int p0) {
 
-        if (!LevelSearchLayer::init(a1)) return false;
+        if (!LevelSearchLayer::init(p0)) return false;
 
-        GlobalVars::getSharedInstance()->isSearchScene = true;
+        if(!p0){
 
-        auto buttonSprite = CCSprite::create("loqui.png"_spr);
+            GlobalVars::getSharedInstance()->isSearchScene = true;
 
-        auto button = CCMenuItemSpriteExtra::create(buttonSprite, this,
-            menu_selector(Loquibot::goToLevel));
+            auto quickSearchMenu = this->getChildByIDRecursive("quick-search-menu");
 
-        auto winSize = CCDirector::sharedDirector()->getWinSize();
+            auto randomButtonSprite = SearchButton::create("GJ_longBtn04_001.png", "Requests", 0.5f, "GJ_sFollowedIcon_001.png");
+            
+            auto loquiSprite = CCSprite::create("loqui_icon.png"_spr);
+            loquiSprite->setScale(0.5f);
 
-        auto menu = this->getChildByID("other-filter-menu");
-        menu->addChild(button);
+            auto oldSprite = dynamic_cast<CCSprite*>(randomButtonSprite->getChildren()->objectAtIndex(1));
+            oldSprite->setVisible(false);
 
-        menu->updateLayout();
+            loquiSprite->setPosition({oldSprite->getPosition().x - 2, oldSprite->getPosition().y});
 
+            randomButtonSprite->addChild(loquiSprite);
+
+            auto randomTabButton = CCMenuItemSpriteExtra::create(randomButtonSprite, this, menu_selector(Loquibot::goToLevel));
+
+            if(quickSearchMenu){
+                quickSearchMenu->addChild(randomTabButton);
+            }
+
+        }
 
         return true;
     }

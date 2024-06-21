@@ -1,9 +1,9 @@
 {
-	"geode": "3.0.0-beta.1",
+	"geode": "3.0.0-beta.4",
 	"gd": {
 		"win": "2.206"
 	},
-	"version": "v1.4.3",
+	"version": "v1.4.4",
 	"id": "alphalaneous.integratedloquibot",
 	"name": "Integrated Loquibot",
 	"developer": "Alphalaneous",
@@ -14,15 +14,16 @@
             "id": "geode.node-ids",
             "version": ">=v1.12.0-beta.2",
             "importance": "required"
+        },
+		{
+            "id": "alphalaneous.pages_api",
+            "version": ">=v1.0.1",
+            "importance": "required"
         }
     ],
 	"resources": {
         "sprites": [
-			"resources/LB_blockLevelBtn.png",
-			"resources/LB_randomBtn.png",
-			"resources/loqui.png",
-			"resources/levelRequestsLabel.png",
-			"resources/videoBorder.png"
+			"resources/*"
         ]
     }
 }
