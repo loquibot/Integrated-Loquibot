@@ -14,6 +14,10 @@ matjson::Value getFromArray(int id);
 
 class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
+    struct Fields {
+        bool m_isLevelRequest = false;
+    };
+
     bool init(GJGameLevel * level, bool a2) {
 
         if (!LevelInfoLayer::init(level, a2)) return false;
@@ -22,6 +26,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
         if (level->m_levelID == GlobalVars::getSharedInstance()->currentID) {
 
+            m_fields->m_isLevelRequest = true;
             GlobalVars::getSharedInstance()->isLoquiMenu = true;
 
             matjson::Value listLevel = getFromArray(level->m_levelID);
@@ -174,7 +179,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
     void updateLabelValues(){
         LevelInfoLayer::updateLabelValues();
-        fixLevelInfoSize();
+        if(m_fields->m_isLevelRequest) fixLevelInfoSize();
     }
 
     void onBack(CCObject* object) {

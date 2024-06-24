@@ -1,9 +1,9 @@
 {
-	"geode": "3.0.0-beta.4",
+	"geode": "3.0.0",
 	"gd": {
 		"win": "2.206"
 	},
-	"version": "v1.4.4",
+	"version": "v1.4.5",
 	"id": "alphalaneous.integratedloquibot",
 	"name": "Integrated Loquibot",
 	"developer": "Alphalaneous",
