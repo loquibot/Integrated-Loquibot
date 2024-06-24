@@ -281,11 +281,14 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
         if(CCNode* label = getChildByID("length-label")){
             CCNode* icon = getChildByID("length-icon");
             if(label->getPosition().y == icon->getPosition().y){
-                label->setPosition({label->getPosition().x, label->getPosition().y + 5});
-                label->setUserObject("original-y", CCFloat::create(label->getPosition().y));
+                
                 if(CCNode* exactLength = getChildByID("exact-length-label")){
-                    exactLength->setPosition({exactLength->getPosition().x, exactLength->getPosition().y + 5});
-                    exactLength->setUserObject("original-y", CCFloat::create(exactLength->getPosition().y));
+                    if(exactLength->isVisible()){
+                        label->setPosition({label->getPosition().x, label->getPosition().y + 5});
+                        label->setUserObject("original-y", CCFloat::create(label->getPosition().y));
+                        exactLength->setPosition({exactLength->getPosition().x, exactLength->getPosition().y + 5});
+                        exactLength->setUserObject("original-y", CCFloat::create(exactLength->getPosition().y));
+                    }
                 }
             }
         }
@@ -299,11 +302,14 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
             CCNode* icon = node->getParent()->getChildByID("length-icon");
             if(node->getPosition().y == icon->getPosition().y){
-                node->setPosition({node->getPosition().x, node->getPosition().y + 5});
-                node->setUserObject("original-y", CCFloat::create(node->getPosition().y));
+                
                 if(CCNode* exactLength = node->getParent()->getChildByID("exact-length-label")){
-                    exactLength->setPosition({exactLength->getPosition().x, exactLength->getPosition().y + 5});
-                    exactLength->setUserObject("original-y", CCFloat::create(exactLength->getPosition().y));
+                    if(exactLength->isVisible()){
+                        node->setPosition({node->getPosition().x, node->getPosition().y + 5});
+                        node->setUserObject("original-y", CCFloat::create(node->getPosition().y));
+                        exactLength->setPosition({exactLength->getPosition().x, exactLength->getPosition().y + 5});
+                        exactLength->setUserObject("original-y", CCFloat::create(exactLength->getPosition().y));
+                    }
                 }
             }
         }
