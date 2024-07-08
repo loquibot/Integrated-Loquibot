@@ -214,6 +214,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
         else {
             LevelInfoLayer::onBack(object);
         }
+        GlobalVars::getSharedInstance()->isLoquiMenu = false;
     }
 
 

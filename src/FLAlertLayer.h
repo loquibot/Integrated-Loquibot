@@ -1,6 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
 #include "TextArea.h"
+#include "GlobalVars.h"
 
 using namespace geode::prelude;
 
@@ -39,24 +40,52 @@ class $modify(FLAlertLayer) {
 
 	void show() {
         
-        CCDirector* director = CCDirector::sharedDirector();
+        if(!GlobalVars::getSharedInstance()->isLoquiMenu){
+            FLAlertLayer::show();
+        }
+        else{
+            CCDirector* director = CCDirector::sharedDirector();
 
-        unsigned int opacity;
-        int zOrder;
+            unsigned int opacity;
+            int zOrder;
 
-        CCScaleTo* scaleTo = CCScaleTo::create(0.5, 1.0);
-        CCEaseElasticOut* easeElasticOut = CCEaseElasticOut::create((CCActionInterval*)scaleTo, 0.6);
-        CCFadeTo* fadeTo;
+            CCScaleTo* scaleTo = CCScaleTo::create(0.5, 1.0);
+            CCEaseElasticOut* easeElasticOut = CCEaseElasticOut::create((CCActionInterval*)scaleTo, 0.6);
+            CCFadeTo* fadeTo;
 
-        CCScene* runningScene;
-        CCScene* nextScene;
+            CCScene* runningScene;
+            CCScene* nextScene;
 
-        if(m_noElasticity) {
+            if(m_noElasticity) {
+                runningScene = director->m_pRunningScene;
+                nextScene = (CCScene*) m_scene;
+                if(nextScene == nullptr) {
+                    zOrder = runningScene->getHighestChildZ() + 1;
+                    if(zOrder < 105){
+                        zOrder = 105;
+                    }
+                    m_ZOrder = zOrder;
+                    nextScene = runningScene;
+                }
+                if(m_ZOrder == 0) {
+                    m_ZOrder = 105;
+                }
+                nextScene->addChild(this, m_ZOrder);
+                this->setKeypadEnabled(true);
+                return;
+            }
+
+            opacity = this->getOpacity();
+
+            m_mainLayer->setScale(0.1f);
+            m_mainLayer->runAction(easeElasticOut);
+
             runningScene = director->m_pRunningScene;
             nextScene = (CCScene*) m_scene;
+
             if(nextScene == nullptr) {
                 zOrder = runningScene->getHighestChildZ() + 1;
-                if(zOrder < 105){
+                if(zOrder < 105) {
                     zOrder = 105;
                 }
                 m_ZOrder = zOrder;
@@ -65,69 +94,46 @@ class $modify(FLAlertLayer) {
             if(m_ZOrder == 0) {
                 m_ZOrder = 105;
             }
-            nextScene->addChild(this, m_ZOrder);
-            this->setKeypadEnabled(true);
-            return;
-        }
 
-        opacity = this->getOpacity();
+            //fix crash if vanilla alert protocol is nullptr
+            
+            bool isScroll = !!getChildByIDRecursive("scroll-layer");
+            bool hasTextArea = !!getChildByIDRecursive("content-text-area");
+            bool hasAlertProtocol = !!m_alertProtocol;
+            bool isDefault = this->m_fields->m_isDefault;
+            bool isSpecial = this->m_fields->m_isSpecial;
 
-        m_mainLayer->setScale(0.1f);
-        m_mainLayer->runAction(easeElasticOut);
+            if(hasAlertProtocol || !isDefault || isSpecial || !hasTextArea || isScroll) {
+                nextScene->addChild(this, zOrder);
 
-        runningScene = director->m_pRunningScene;
-        nextScene = (CCScene*) m_scene;
+                this->setOpacity(0);
 
-        if(nextScene == nullptr) {
-            zOrder = runningScene->getHighestChildZ() + 1;
-            if(zOrder < 105) {
-                zOrder = 105;
+                fadeTo = CCFadeTo::create(0.14, opacity);
+                this->runAction(fadeTo);
+                this->setKeypadEnabled(true);
+                return;
             }
-            m_ZOrder = zOrder;
-            nextScene = runningScene;
-        }
-        if(m_ZOrder == 0) {
-            m_ZOrder = 105;
-        }
 
-        //fix crash if vanilla alert protocol is nullptr
-        
-        bool isScroll = !!getChildByIDRecursive("scroll-layer");
-        bool hasTextArea = !!getChildByIDRecursive("content-text-area");
-        bool hasAlertProtocol = !!m_alertProtocol;
-        bool isDefault = this->m_fields->m_isDefault;
-        bool isSpecial = this->m_fields->m_isSpecial;
+            if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
 
-        if(hasAlertProtocol || !isDefault || isSpecial || !hasTextArea || isScroll) {
-            nextScene->addChild(this, zOrder);
+                auto textNode = getChildByIDRecursive("content-text-area");
+                auto titleNode = getChildByIDRecursive("title");
 
-            this->setOpacity(0);
+                std::string text = this->m_fields->m_desc;
+                std::string titleText = this->m_fields->m_title;
 
-            fadeTo = CCFadeTo::create(0.14, opacity);
-            this->runAction(fadeTo);
-            this->setKeypadEnabled(true);
-            return;
-        }
-
-        if(m_alertProtocol == nullptr && this->m_fields->m_isDefault) {
-
-            auto textNode = getChildByIDRecursive("content-text-area");
-            auto titleNode = getChildByIDRecursive("title");
-
-            std::string text = this->m_fields->m_desc;
-            std::string titleText = this->m_fields->m_title;
-
-            if(textNode){
-                MyTextArea* area = dynamic_cast<MyTextArea*>(textNode);
-                if(area){
-                    text = area->getString();
+                if(textNode){
+                    MyTextArea* area = dynamic_cast<MyTextArea*>(textNode);
+                    if(area){
+                        text = area->getString();
+                    }
                 }
-            }
-            if(titleNode){
-                titleText = (dynamic_cast<CCLabelBMFont*>(titleNode))->getString();
-            }
+                if(titleNode){
+                    titleText = (dynamic_cast<CCLabelBMFont*>(titleNode))->getString();
+                }
 
-            geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
+                geode::createQuickPopup(this->m_fields->m_title, this->m_fields->m_desc, this->m_fields->m_btn1, this->m_fields->m_btn2, nullptr, true);
+            }
         }
 	}
 };
