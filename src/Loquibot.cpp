@@ -20,22 +20,21 @@ std::string confirm = "Okay";
 
 Loquibot* Loquibot::instance = nullptr;
 
-void hideButtons(CCObject* obj) {
+void Loquibot::hideButtons(CCObject* obj) {
 
     CCMenuItemSpriteExtra* button = reinterpret_cast<CCMenuItemSpriteExtra*>(obj);
-    
+    Loquibot::getSharedInstance()->m_isClickable = false;
     auto menu = button->getParent();
     if(menu){
-        if (menu->getID() == "main-button-menu"_spr || menu->getID() == "top-button-menu"_spr) {
+        if (menu->getID() == "main-button-menu"_spr) {
 
             menu->getParent()->getChildByID("main-button-menu"_spr)->setVisible(false);
-            menu->getParent()->getChildByID("top-button-menu"_spr)->setVisible(false);
 
             auto winSize = CCDirector::sharedDirector()->getWinSize();
 
             CCSprite* loadingSprite = CCSprite::create("loadingCircle.png");
 
-            loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 70 });
+            loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 55 });
             loadingSprite->setID("loading_sprite"_spr);
             loadingSprite->setScale(0.5);
             loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
@@ -60,13 +59,13 @@ void Loquibot::copyRequesterName(CCObject* obj) {
 void Loquibot::showButtons() {
 
     CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+    Loquibot::getSharedInstance()->m_isClickable = true;
 
 	LevelInfoLayer* layer = dynamic_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
     
     if(layer){
 
         auto menu = layer->getChildByID("main-button-menu"_spr);
-        layer->getChildByID("top-button-menu"_spr)->setVisible(true);
         
         if(menu){
             menu->setVisible(true);
@@ -82,6 +81,8 @@ void Loquibot::goToLevel(CCObject* obj) {
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
     
+    if (!Loquibot::getSharedInstance()->m_isClickable) return;
+
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) {
@@ -100,6 +101,8 @@ void Loquibot::goToNextLevel(CCObject* obj) {
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
+    if (!Loquibot::getSharedInstance()->m_isClickable) return;
+
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) {
@@ -117,6 +120,8 @@ void Loquibot::goToNextLevel(CCObject* obj) {
 void Loquibot::goToTopLevel(CCObject* obj) {
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
+
+    if (!Loquibot::getSharedInstance()->m_isClickable) return;
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
@@ -137,6 +142,8 @@ void Loquibot::goToRandomLevel(CCObject* obj) {
    
     if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
 
+    if (!Loquibot::getSharedInstance()->m_isClickable) return;
+
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) {
@@ -153,6 +160,8 @@ void Loquibot::goToRandomLevel(CCObject* obj) {
 void Loquibot::goToUndoLevel(CCObject* obj) {
 
     if (!GlobalVars::getSharedInstance()->loquiOpen) ServerListener::connectAsync();
+
+    if (!Loquibot::getSharedInstance()->m_isClickable) return;
 
     auto alertLayer = FLAlertLayer::create(nullptr, title.c_str(), notice, confirm.c_str(), nullptr, 300);
 

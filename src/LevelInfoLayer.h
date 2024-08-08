@@ -25,6 +25,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
         if (level->m_levelID == GlobalVars::getSharedInstance()->currentID) {
+            Loquibot::getSharedInstance()->m_isClickable = true;
 
             m_fields->m_isLevelRequest = true;
             GlobalVars::getSharedInstance()->isLoquiMenu = true;
@@ -40,11 +41,11 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 requester = GlobalVars::getSharedInstance()->requester;
             }
             
-
             auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
             nextButtonSprite->setFlipX(true);
 
             auto topButtonSprite = CCSprite::createWithSpriteFrameName("GJ_orderUpBtn_001.png");
+            topButtonSprite->setScale(0.925f);
 
             float buttonXPos = winSize.width - 100;
 
@@ -58,7 +59,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 menu_selector(Loquibot::goToTopLevel));
 
             topButton->setID("top-button"_spr);
-            topButton->setPosition({ 0, 0});
+            topButton->setPosition({ buttonXPos, winSize.height / 2 + 110 });
 
             auto randomButtonSprite = CCSprite::create("LB_randomBtn.png"_spr);
             randomButtonSprite->setFlipX(true);
@@ -76,14 +77,13 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             undoButton->setPosition({ 80, winSize.height / 2 + 30 });
 
             auto blockButtonSprite = CCSprite::create("LB_blockLevelBtn.png"_spr);
-            blockButtonSprite->setScale(0.75f);
             auto blockButton = CCMenuItemSpriteExtra::create(blockButtonSprite, this,
                 menu_selector(Loquibot::showBlockMenu));
 
             blockButton->setPosition({ buttonXPos, winSize.height / 2 + 90 });
 
             auto topLabel = CCLabelBMFont::create("Top", "bigFont.fnt");
-            topLabel->setPosition({ 25, 13 });
+            topLabel->setPosition({ topButtonSprite->getScaledContentSize().width/2, 13 });
             topLabel->setScale(0.4f);
             topLabel->setZOrder(10);
             topButton->addChild(topLabel);
@@ -111,36 +111,25 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             auto menu = CCMenu::create();
             menu->setID("main-button-menu"_spr);
             menu->setScale(0.8f);
-            menu->setAnchorPoint({1, 0.5});
-            auto actionButtonMenu = CCMenu::create();
+            menu->setContentSize({45, 190});
 
-            menu->addChild(blockButton);
+            auto columnLayout = ColumnLayout::create();
+            columnLayout->setAxisReverse(true);
+            columnLayout->setGap(15);
+
+            menu->setLayout(columnLayout);
+
             menu->addChild(nextButton);
             menu->addChild(randomButton);
 
-            auto topButtonMenu = CCMenu::create();
+            menu->updateLayout();
 
-            topButtonMenu->setPosition({buttonXPos - 24, winSize.height - 20}); //469, 240
-            topButtonMenu->setContentSize({0, 0});
-            topButtonMenu->setScale(0.5f);
-            topButtonMenu->setID("top-button-menu"_spr);
+            menu->setPosition({winSize.width - 80, winSize.height/2 + 30});
 
-            topButtonMenu->addChild(topButton);
-
-            actionButtonMenu->setContentSize({ 0,0 });
-
-            actionButtonMenu->setPosition({ winSize.width / 2 - 55, winSize.height / 2 + 25 });
-            actionButtonMenu->setScale(0.5f);
-
-            menu->setPosition({ 0,0 });
-            this->addChild(topButtonMenu);
-
-            CCMenu* otherMenu = typeinfo_cast<CCMenu*>(this->getChildByID("other-menu"));
-
-            CCMenuItemSpriteExtra* listButton = typeinfo_cast<CCMenuItemSpriteExtra*>(otherMenu->getChildByID("list-button"));
-            CCMenuItemSpriteExtra* favoritesButton = typeinfo_cast<CCMenuItemSpriteExtra*>(otherMenu->getChildByID("favorite-button"));
-
-            listButton->setPosition(favoritesButton->getPositionX(), favoritesButton->getPositionY()+40);
+            CCMenu* rightSideMenu = typeinfo_cast<CCMenu*>(this->getChildByID("right-side-menu"));
+            rightSideMenu->addChild(topButton);
+            rightSideMenu->addChild(blockButton);
+            rightSideMenu->updateLayout();
 
             CCMenu* backMenu = typeinfo_cast<CCMenu*>(this->getChildByID("back-menu"));
             auto levelListSprite = CCSprite::createWithSpriteFrameName("GJ_menuBtn_001.png");
@@ -155,7 +144,6 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             backMenu->updateLayout();
 
             this->addChild(menu);
-            this->addChild(actionButtonMenu);
 
             CCNode* title = this->getChildByID("title-label");
 

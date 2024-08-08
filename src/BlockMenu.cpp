@@ -4,9 +4,9 @@
 
 void BlockMenu::setup() {
     
-    ButtonSprite* blockIDSprite = ButtonSprite::create("Block Level");
-    ButtonSprite* blockCreatorSprite = ButtonSprite::create("Block Creator");
-    ButtonSprite* blockRequesterSprite = ButtonSprite::create("Block Requester");
+    ButtonSprite* blockIDSprite = ButtonSprite::create("Level", 100, true, "bigFont.fnt", "geode.loader/GE_button_05.png", 30, 1);
+    ButtonSprite* blockCreatorSprite = ButtonSprite::create("Creator", 100, true, "bigFont.fnt", "geode.loader/GE_button_05.png", 30, 1);
+    ButtonSprite* blockRequesterSprite = ButtonSprite::create("Requester", 100, true, "bigFont.fnt", "geode.loader/GE_button_05.png", 30, 1);
 
     CCMenuItemSpriteExtra* blockIDButton = CCMenuItemSpriteExtra::create(blockIDSprite, this, menu_selector(Loquibot::blockLevel));
     CCMenuItemSpriteExtra* blockCreatorButton = CCMenuItemSpriteExtra::create(blockCreatorSprite, this, menu_selector(Loquibot::blockCreator));
@@ -28,7 +28,7 @@ void BlockMenu::setup() {
 
 BlockMenu* BlockMenu::create() {
     auto pRet = new BlockMenu();
-    if (pRet && pRet->init(350, 200, "GJ_square01.png", "Block?")) {
+    if (pRet && pRet->init(200, 200, "geode.loader/GE_square03.png", "Block?")) {
         pRet->autorelease();
         return pRet;
     }

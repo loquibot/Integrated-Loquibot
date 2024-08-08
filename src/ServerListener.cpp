@@ -222,6 +222,7 @@ void ServerListener::onMessage(std::string message) {
                 requester = levelJson["requester"].as_string();
 
                 GlobalVars::getSharedInstance()->requester = requester;
+                GlobalVars::getSharedInstance()->creator = creator;
 
                 int ID = levelJson["id"].as_int();
                 int songID = levelJson["songID"].as_int();

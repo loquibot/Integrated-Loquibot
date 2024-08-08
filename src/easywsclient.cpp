@@ -74,6 +74,7 @@
 #include <string>
 
 #include "easywsclient.hpp"
+#include "Geode/Geode.hpp"
 
 using easywsclient::Callback_Imp;
 using easywsclient::BytesCallback_Imp;
@@ -93,7 +94,7 @@ socket_t hostname_connect(const std::string& hostname, int port) {
     snprintf(sport, 16, "%d", port);
     if ((ret = getaddrinfo(hostname.c_str(), sport, &hints, &result)) != 0)
     {
-      fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
+      geode::log::error("getaddrinfo {}", gai_strerror(ret));
       return 1;
     }
     for(p = result; p != NULL; p = p->ai_next)
@@ -317,7 +318,7 @@ class _RealWebSocket : public easywsclient::WebSocket
                     // if it were valid. So just close() and return immediately
                     // for now.
                     isRxBad = true;
-                    fprintf(stderr, "ERROR: Frame has invalid frame length. Closing.\n");
+                    geode::log::error("ERROR: Frame has invalid frame length. Closing.");
                     close();
                     return;
                 }
@@ -361,7 +362,10 @@ class _RealWebSocket : public easywsclient::WebSocket
             }
             else if (ws.opcode == wsheader_type::PONG) { }
             else if (ws.opcode == wsheader_type::CLOSE) { close(); }
-            else { fprintf(stderr, "ERROR: Got unexpected WebSocket message.\n"); close(); }
+            else { 
+                geode::log::error("ERROR: Got unexpected WebSocket message.");
+                close(); 
+            }
 
             rxbuf.erase(rxbuf.begin(), rxbuf.begin() + ws.header_size+(size_t)ws.N);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -462,12 +466,12 @@ easywsclient::WebSocket::pointer from_url(const std::string& url, bool useMask, 
     int port;
     char path[512];
     if (url.size() >= 512) {
-      fprintf(stderr, "ERROR: url size limit exceeded: %s\n", url.c_str());
-      return NULL;
+        geode::log::error("ERROR: url size limit exceeded: {}", url.c_str());
+        return NULL;
     }
     if (origin.size() >= 200) {
-      fprintf(stderr, "ERROR: origin size limit exceeded: %s\n", origin.c_str());
-      return NULL;
+        geode::log::error("ERROR: origin size limit exceeded: {}", origin.c_str());
+        return NULL;
     }
     if (false) { }
     else if (sscanf(url.c_str(), "ws://%[^:/]:%d/%s", host, &port, path) == 3) {
@@ -483,13 +487,13 @@ easywsclient::WebSocket::pointer from_url(const std::string& url, bool useMask, 
         path[0] = '\0';
     }
     else {
-        fprintf(stderr, "ERROR: Could not parse WebSocket url: %s\n", url.c_str());
+        geode::log::error("ERROR: Could not parse WebSocket url: {}", url.c_str());
         return NULL;
     }
     //fprintf(stderr, "easywsclient: connecting: host=%s port=%d path=/%s\n", host, port, path);
     socket_t sockfd = hostname_connect(host, port);
     if (sockfd == INVALID_SOCKET) {
-        fprintf(stderr, "Unable to connect to %s:%d\n", host, port);
+        geode::log::error("Unable to connect to {}:{}", host, port);
         return NULL;
     }
     {
@@ -514,8 +518,14 @@ easywsclient::WebSocket::pointer from_url(const std::string& url, bool useMask, 
         snprintf(line, 1024, "\r\n"); ::send(sockfd, line, strlen(line), 0);
         for (i = 0; i < 2 || (i < 1023 && line[i-2] != '\r' && line[i-1] != '\n'); ++i) { if (recv(sockfd, line+i, 1, 0) == 0) { return NULL; } }
         line[i] = 0;
-        if (i == 1023) { fprintf(stderr, "ERROR: Got invalid status line connecting to: %s\n", url.c_str()); return NULL; }
-        if (sscanf(line, "HTTP/1.1 %d", &status) != 1 || status != 101) { fprintf(stderr, "ERROR: Got bad status connecting to %s: %s", url.c_str(), line); return NULL; }
+        if (i == 1023) { 
+            geode::log::error("ERROR: Got invalid status line connecting to:",  url.c_str());
+            return NULL; 
+        }
+        if (sscanf(line, "HTTP/1.1 %d", &status) != 1 || status != 101) { 
+            geode::log::error("ERROR: Got bad status connecting to {}: {}",  url.c_str(), line);
+            return NULL; 
+        }
         // TODO: verify response headers,
         while (true) {
             for (i = 0; i < 2 || (i < 1023 && line[i-2] != '\r' && line[i-1] != '\n'); ++i) { if (recv(sockfd, line+i, 1, 0) == 0) { return NULL; } }

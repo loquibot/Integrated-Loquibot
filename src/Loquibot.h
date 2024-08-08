@@ -11,7 +11,9 @@ class Loquibot {
 protected:
     static Loquibot* instance;
 public:
+    bool m_isClickable = true;
     void showButtons();
+    void hideButtons(CCObject*);
     void goToLevel(CCObject*);
     void goToNextLevel(CCObject*);
     void goToTopLevel(CCObject*);
