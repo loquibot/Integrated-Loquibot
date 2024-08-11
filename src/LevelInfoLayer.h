@@ -5,6 +5,7 @@
 
 #include <Geode/Geode.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
+#include <Geode/modify/FLAlertLayer.hpp>
 #include "ServerListener.h"
 #include "Loquibot.h"
 #include "GlobalVars.h"
@@ -12,15 +13,69 @@
 
 matjson::Value getFromArray(int id);
 
+bool isLoquiDownload = false;
+
+class $modify(FLAlertLayer) {
+
+    struct Fields {
+        bool m_showable = true;
+    };
+
+    bool init(FLAlertLayerProtocol* p0, char const* p1, gd::string p2, char const* p3, char const* p4, float p5, bool p6, float p7, float p8) {
+        
+        if(isLoquiDownload) {
+            m_fields->m_showable = false;
+
+            geode::createQuickPopup(p1, p2, p3, p4, nullptr, true);
+
+            return true;
+        }
+        return FLAlertLayer::init(p0, p1, p2, p3, p4, p5, p6, p7, p8);
+    }
+
+    void show(){
+        if(m_fields->m_showable) {
+            FLAlertLayer::show();
+        }
+    }
+};
+
 class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
     struct Fields {
         bool m_isLevelRequest = false;
     };
 
-    bool init(GJGameLevel * level, bool a2) {
+    void levelDownloadFinished(GJGameLevel* p0){
+        if(m_fields->m_isLevelRequest){
+            isLoquiDownload = true;
+        }
+
+        LevelInfoLayer::levelDownloadFinished(p0);
+
+        isLoquiDownload = false;
+    }
+
+    void levelDownloadFailed(int p0){
+        
+        if(m_fields->m_isLevelRequest){
+            isLoquiDownload = true;
+        }
+
+        LevelInfoLayer::levelDownloadFailed(p0);
+
+        isLoquiDownload = false;
+    }
+
+    bool init(GJGameLevel* level, bool a2) {
+
+        if(level->m_levelID == GlobalVars::getSharedInstance()->currentID){
+            isLoquiDownload = true;
+        }
 
         if (!LevelInfoLayer::init(level, a2)) return false;
+
+        isLoquiDownload = false;
 
         auto winSize = CCDirector::sharedDirector()->getWinSize();
 
