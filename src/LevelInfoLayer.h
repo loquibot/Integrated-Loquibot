@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef __LOLEVELINFOLAYER_HPP
-#define __LOLEVELINFOLAYER_HPP
-
 #include <Geode/Geode.hpp>
 #include <Geode/modify/LevelInfoLayer.hpp>
 #include <Geode/modify/FLAlertLayer.hpp>
@@ -234,18 +231,13 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
                 GlobalVars::getSharedInstance()->deleting = false;
             }
             else {
-                auto scene = CCScene::create();
-
                 if (GlobalVars::getSharedInstance()->isSearchScene) {
-#ifdef GEODE_IS_WINDOWS
-                    scene = LevelSearchLayer::scene(0);
+                    auto scene = LevelSearchLayer::scene(0);
                     auto transition = CCTransitionFade::create(0.5f, scene);
                     CCDirector::sharedDirector()->replaceScene(transition);
-#endif
                 }
                 else {
-                    auto layerMenu = MenuLayer::scene(false);
-                    scene->addChild(layerMenu);
+                    auto scene = MenuLayer::scene(false);
                     auto transition = CCTransitionFade::create(0.5f, scene);
                     CCDirector::sharedDirector()->replaceScene(transition);
                 }
@@ -383,5 +375,3 @@ matjson::Value getFromArray(int id){
 
     return nullptr;
 }
-
-#endif

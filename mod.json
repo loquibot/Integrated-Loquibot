@@ -1,10 +1,10 @@
 {
-	"geode": "3.4.0",
+	"geode": "3.8.1",
 	"gd": {
 		"win": "2.206",
 		"mac": "2.206"
 	},
-	"version": "v1.5.1",
+	"version": "v1.5.2",
 	"id": "alphalaneous.integratedloquibot",
 	"name": "Integrated Loquibot",
 	"developer": "Alphalaneous",
@@ -13,12 +13,12 @@
 	"dependencies": [
         {
             "id": "geode.node-ids",
-            "version": ">=v1.12.0-beta.2",
+            "version": ">=v1.15.0",
             "importance": "required"
         },
 		{
             "id": "alphalaneous.pages_api",
-            "version": ">=v1.0.1",
+            "version": ">=v1.3.0",
             "importance": "required"
         }
     ],

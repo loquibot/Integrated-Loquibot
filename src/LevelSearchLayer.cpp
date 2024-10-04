@@ -2,6 +2,7 @@
 #include "ServerListener.h"
 #include "Loquibot.h"
 #include "GlobalVars.h"
+#include <alphalaneous.pages_api/include/PageMenu.h>
 
 #ifdef GEODE_IS_WINDOWS
 
@@ -43,11 +44,24 @@ class $modify(LevelSearchLayer) {
                 quickSearchMenu->addChild(randomTabButton);
             }
 
+            RowLayout* layout = RowLayout::create();
+            layout->setGrowCrossAxis(true);
+            layout->setCrossAxisOverflow(false);
+            layout->setAxisAlignment(AxisAlignment::Center);
+            layout->setCrossAxisAlignment(AxisAlignment::Center);
+            layout->ignoreInvisibleChildren(true);
+
+            quickSearchMenu->setContentSize({365, 116});
+            quickSearchMenu->ignoreAnchorPointForPosition(false);
+            quickSearchMenu->setPosition({quickSearchMenu->getPosition().x, quickSearchMenu->getPosition().y + 28});
+
+            PageMenu* menuPage = PageMenu::create(typeinfo_cast<CCMenu*>(quickSearchMenu), layout, 9);
+
+            addChild(menuPage);
         }
 
         return true;
     }
-
 };
 
 #endif
