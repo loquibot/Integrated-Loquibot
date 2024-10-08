@@ -26,22 +26,22 @@ class $modify(LevelSearchLayer) {
 
             auto quickSearchMenu = this->getChildByIDRecursive("quick-search-menu");
 
-            auto randomButtonSprite = SearchButton::create("GJ_longBtn04_001.png", "Requests", 0.5f, "GJ_sFollowedIcon_001.png");
+            auto requestsButtonSprite = SearchButton::create("GJ_longBtn04_001.png", "Requests", 0.5f, "GJ_sFollowedIcon_001.png");
             
             auto loquiSprite = CCSprite::create("loqui_icon.png"_spr);
             loquiSprite->setScale(0.5f);
 
-            auto oldSprite = dynamic_cast<CCSprite*>(randomButtonSprite->getChildren()->objectAtIndex(1));
+            auto oldSprite = dynamic_cast<CCSprite*>(requestsButtonSprite->getChildren()->objectAtIndex(1));
             oldSprite->setVisible(false);
 
             loquiSprite->setPosition({oldSprite->getPosition().x - 2, oldSprite->getPosition().y});
 
-            randomButtonSprite->addChild(loquiSprite);
+            requestsButtonSprite->addChild(loquiSprite);
 
-            auto randomTabButton = CCMenuItemSpriteExtra::create(randomButtonSprite, this, menu_selector(Loquibot::goToLevel));
+            auto requestsButton = CCMenuItemSpriteExtra::create(requestsButtonSprite, this, menu_selector(Loquibot::goToLevel));
 
             if(quickSearchMenu){
-                quickSearchMenu->addChild(randomTabButton);
+                quickSearchMenu->addChild(requestsButton);
             }
 
             RowLayout* layout = RowLayout::create();

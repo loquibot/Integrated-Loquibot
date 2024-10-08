@@ -294,8 +294,14 @@ void ServerListener::onMessage(std::string message) {
 
                 auto winSize = CCDirector::sharedDirector()->getWinSize();
 
+                float heightOffset = 60.f;
+
+                if (Loader::get()->isModLoaded("n.level-pronouns")) {
+                    heightOffset += 5.f;
+                }
+
                 requesterButton->setPosition({ winSize.width / 2,
-                    winSize.height - 60 });
+                    winSize.height - heightOffset });
 
                 auto scene = CCScene::create();
                 scene->addChild(layer);

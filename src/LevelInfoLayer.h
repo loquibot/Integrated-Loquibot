@@ -7,6 +7,7 @@
 #include "Loquibot.h"
 #include "GlobalVars.h"
 #include "GJGameLevel.h"
+#include <alphalaneous.pages_api/include/PageMenu.h>
 
 matjson::Value getFromArray(int id);
 
@@ -150,8 +151,14 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
             auto requesterMenu = CCMenu::create();
 
-            CCMenuItemSpriteExtra* requesterButton = CCMenuItemSpriteExtra::create(requesterLabel, requesterMenu, menu_selector(Loquibot::copyRequesterName));
-            requesterButton->setPosition({ winSize.width / 2, winSize.height - 60 });
+            float heightOffset = 60.f;
+
+            if (Loader::get()->isModLoaded("n.level-pronouns")) {
+                heightOffset += 5.f;
+            }
+
+            CCMenuItemSpriteExtra* requesterButton = CCMenuItemSpriteExtra::create(requesterLabel, this, menu_selector(Loquibot::copyRequesterName));
+            requesterButton->setPosition({ winSize.width / 2, winSize.height - heightOffset });
             requesterButton->setID("requester-button"_spr);
 
             requesterMenu->addChild(requesterButton);
@@ -162,25 +169,43 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
             auto menu = CCMenu::create();
             menu->setID("main-button-menu"_spr);
-            menu->setScale(0.8f);
-            menu->setContentSize({45, 190});
+            menu->setScale(0.6f);
+            menu->setContentSize({45, 110});
+
+            float bgScale = 0.5f;
+
+            auto menuBG = CCScale9Sprite::create("square02b_001.png");
+            menuBG->setColor({0, 0, 0});
+            menuBG->setOpacity(127);
+            menuBG->setContentSize(CCSize{45, 90} / bgScale);
+            menuBG->setPosition({winSize.width - 74, winSize.height/2 + 30});
+            menuBG->setScale(bgScale * 0.75f);
+            this->addChild(menuBG);
 
             auto columnLayout = ColumnLayout::create();
             columnLayout->setAxisReverse(true);
-            columnLayout->setGap(15);
+            columnLayout->setGap(10);
 
             menu->setLayout(columnLayout);
 
             menu->addChild(nextButton);
             menu->addChild(randomButton);
+            menu->addChild(topButton);
+            menu->addChild(blockButton);
+
+            this->addChild(menu);
+
+            PageMenu* menuPage = PageMenu::create(menu, columnLayout, 2);
+            menuPage->setOrientation(PageOrientation::VERTICAL);
+            
+            this->addChild(menuPage);
 
             menu->updateLayout();
 
-            menu->setPosition({winSize.width - 80, winSize.height/2 + 30});
+            menu->setPosition({winSize.width - 74, winSize.height/2 + 30});
 
             CCMenu* rightSideMenu = typeinfo_cast<CCMenu*>(this->getChildByID("right-side-menu"));
-            rightSideMenu->addChild(topButton);
-            rightSideMenu->addChild(blockButton);
+
             rightSideMenu->updateLayout();
 
             CCMenu* backMenu = typeinfo_cast<CCMenu*>(this->getChildByID("back-menu"));
@@ -195,7 +220,6 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
             backMenu->updateLayout();
 
-            this->addChild(menu);
 
             CCNode* title = this->getChildByID("title-label");
 
