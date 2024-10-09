@@ -22,28 +22,30 @@ Loquibot* Loquibot::instance = nullptr;
 
 void Loquibot::hideButtons(CCObject* obj) {
 
-    CCMenuItemSpriteExtra* button = reinterpret_cast<CCMenuItemSpriteExtra*>(obj);
+    CCMenuItemSpriteExtra* button = static_cast<CCMenuItemSpriteExtra*>(obj);
     Loquibot::getSharedInstance()->m_isClickable = false;
-    auto menu = button->getParent();
-    if(menu){
-        if (menu->getID() == "main-button-menu"_spr) {
 
-            menu->getParent()->getChildByID("main-button-menu"_spr)->setVisible(false);
+    CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
+	LevelInfoLayer* layer = typeinfo_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
+    if (layer) {
+        auto menu = layer->getChildByID("main-button-menu"_spr);
+        if(menu){
+            menu->setVisible(false);
 
             auto winSize = CCDirector::sharedDirector()->getWinSize();
 
             CCSprite* loadingSprite = CCSprite::create("loadingCircle.png");
 
-            loadingSprite->setPosition({ winSize.width - 80, winSize.height / 2 + 55 });
+            loadingSprite->setPosition({ winSize.width - 75, winSize.height / 2 + 32.5f });
             loadingSprite->setID("loading_sprite"_spr);
-            loadingSprite->setScale(0.5);
+            loadingSprite->setScale(0.4);
             loadingSprite->setBlendFunc({ GL_ONE, GL_ONE_MINUS_CONSTANT_ALPHA });
 
             loadingSprite->runAction(CCRepeatForever::create(
                 CCRotateBy::create(1.0f, 360)
                 )
             );
-            menu->getParent()->addChild(loadingSprite);
+            layer->addChild(loadingSprite);
         }
     }
 }
@@ -61,18 +63,13 @@ void Loquibot::showButtons() {
     CCScene* currentScene = CCDirector::sharedDirector()->getRunningScene();
     Loquibot::getSharedInstance()->m_isClickable = true;
 
-	LevelInfoLayer* layer = dynamic_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
+	LevelInfoLayer* layer = typeinfo_cast<LevelInfoLayer*>(currentScene->getChildren()->objectAtIndex(0));
     
     if(layer){
-
         auto menu = layer->getChildByID("main-button-menu"_spr);
-        
         if(menu){
             menu->setVisible(true);
-
-            if(menu->getParent()->getChildByID("loading_sprite"_spr)){
-                menu->getParent()->removeChildByID("loading_sprite"_spr);
-            }
+            layer->removeChildByID("loading_sprite"_spr);
         }
     }
 }

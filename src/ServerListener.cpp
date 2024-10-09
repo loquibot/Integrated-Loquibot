@@ -80,7 +80,6 @@ void ServerListener::onMessage(std::string message) {
 
         if (levelJson.contains("type")) {
 
-
             std::string type = levelJson["type"].as_string();
 
             if(type == "level_list"){
@@ -181,6 +180,7 @@ void ServerListener::onMessage(std::string message) {
                 if(badUpdate){
                     auto alertLayer = FLAlertLayer::create(new HelpAlertProtocol, "Bad Version!", "Your Loquibot App is out of date!\nClick <cg>Help</c> for more info.", "Okay", "Help", 300);
                     alertLayer->show();
+                    Loquibot::getSharedInstance()->m_isClickable = true;
                     return;
                 }
 
@@ -191,6 +191,7 @@ void ServerListener::onMessage(std::string message) {
                     if(status == "empty"){
                         auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "The queue is empty!", "Okay", nullptr, 300);
                         alertLayer->show();
+                        Loquibot::getSharedInstance()->m_isClickable = true;
                         return;
                     }
 
@@ -203,9 +204,8 @@ void ServerListener::onMessage(std::string message) {
                     if(status == "empty"){
                         auto alertLayer = FLAlertLayer::create(nullptr, "Loquibot", "There are no more levels in the queue!", "Okay", nullptr, 300);
                         alertLayer->show();
-
+                        Loquibot::getSharedInstance()->m_isClickable = true;
                         Loquibot::getSharedInstance()->showButtons();
-
                         return;
                     }
 
