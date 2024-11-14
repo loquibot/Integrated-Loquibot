@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef __LOQUIGJGAMELEVEL_H
-#define __LOQUIGJGAMELEVEL_H
-
 #include <Geode/Geode.hpp>
 #include <Geode/modify/GJGameLevel.hpp>
 
@@ -13,5 +10,3 @@ class $modify(LoquiGJGameLevel, GJGameLevel){
         bool m_isRequest = false;
     };
 };
-
-#endif

@@ -26,7 +26,7 @@ public:
     bool onReqScene;
     int idWithYouTube;
 
-    matjson::Array currentLevelList;
+    std::vector<matjson::Value> currentLevelList;
 
     static GlobalVars* getSharedInstance(){
 

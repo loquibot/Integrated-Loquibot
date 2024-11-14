@@ -88,7 +88,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             std::string requester;
 
             if(listLevel != nullptr){
-                requester = listLevel["requester"].as_string();
+                requester = listLevel["requester"].asString().unwrapOr("");
             }
             else {
                 requester = GlobalVars::getSharedInstance()->requester;
@@ -390,7 +390,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
 matjson::Value getFromArray(int id){
 
-    matjson::Array levels = GlobalVars::getSharedInstance()->currentLevelList;
+    std::vector<matjson::Value> levels = GlobalVars::getSharedInstance()->currentLevelList;
 
     for(int i = 0; i < levels.size(); i++){
         matjson::Value level = levels[i];

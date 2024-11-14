@@ -71,7 +71,7 @@ class $modify(LevelCell){
 
     int getLevelPos(int id){
 
-        matjson::Array levels = GlobalVars::getSharedInstance()->currentLevelList;
+        std::vector<matjson::Value> levels = GlobalVars::getSharedInstance()->currentLevelList;
 
         for(int i = 0; i < levels.size(); i++){
             matjson::Value level = levels[i];
