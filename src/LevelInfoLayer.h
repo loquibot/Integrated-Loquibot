@@ -192,17 +192,12 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             menu->addChild(randomButton);
             menu->addChild(topButton);
             menu->addChild(blockButton);
+            menu->setPosition({winSize.width - 74, winSize.height/2 + 30});
+            menu->updateLayout();
 
             this->addChild(menu);
 
-            PageMenu* menuPage = PageMenu::create(menu, columnLayout, 2);
-            menuPage->setOrientation(PageOrientation::VERTICAL);
-            
-            this->addChild(menuPage);
-
-            menu->updateLayout();
-
-            menu->setPosition({winSize.width - 74, winSize.height/2 + 30});
+            static_cast<PageMenu*>(menu)->setPaged(2, PageOrientation::VERTICAL, 110);
 
             CCMenu* rightSideMenu = typeinfo_cast<CCMenu*>(this->getChildByID("right-side-menu"));
 
@@ -225,11 +220,11 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
             float titleWidth = title->getContentSize().width;
 
-            if(titleWidth >= 300){
+            if (titleWidth >= 300) {
                 setRelativeScale(title, 0.9);
             }
 
-            if(level->m_levelID == GlobalVars::getSharedInstance()->idWithYouTube){
+            if (level->m_levelID == GlobalVars::getSharedInstance()->idWithYouTube) {
                 Loquibot::getSharedInstance()->showYouTube(this);
             }
             fixLevelInfoSize();

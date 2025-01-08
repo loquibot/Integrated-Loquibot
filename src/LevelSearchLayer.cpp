@@ -31,7 +31,7 @@ class $modify(LevelSearchLayer) {
             auto loquiSprite = CCSprite::create("loqui_icon.png"_spr);
             loquiSprite->setScale(0.5f);
 
-            auto oldSprite = dynamic_cast<CCSprite*>(requestsButtonSprite->getChildren()->objectAtIndex(1));
+            auto oldSprite = typeinfo_cast<CCSprite*>(requestsButtonSprite->getChildren()->objectAtIndex(1));
             oldSprite->setVisible(false);
 
             loquiSprite->setPosition({oldSprite->getPosition().x - 2, oldSprite->getPosition().y});
@@ -50,16 +50,16 @@ class $modify(LevelSearchLayer) {
             layout->setAxisAlignment(AxisAlignment::Center);
             layout->setCrossAxisAlignment(AxisAlignment::Center);
             layout->ignoreInvisibleChildren(true);
+            layout->setGap(5.5f);
 
             quickSearchMenu->setContentSize({365, 116});
             quickSearchMenu->ignoreAnchorPointForPosition(false);
+            quickSearchMenu->setLayout(layout);
 
             CCSize winSize = CCDirector::get()->getWinSize();
             quickSearchMenu->setPosition({quickSearchMenu->getPosition().x, winSize.height/2 + 28});
 
-            PageMenu* menuPage = PageMenu::create(typeinfo_cast<CCMenu*>(quickSearchMenu), layout, 9);
-
-            addChild(menuPage);
+            static_cast<PageMenu*>(quickSearchMenu)->setPaged(9, PageOrientation::HORIZONTAL, 422);
         }
 
         return true;
