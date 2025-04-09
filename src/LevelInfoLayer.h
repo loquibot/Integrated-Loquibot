@@ -93,6 +93,43 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             else {
                 requester = GlobalVars::getSharedInstance()->requester;
             }
+
+            if (Mod::get()->getSettingValue<bool>("show-auto-pin")) {
+                GlobalVars::getSharedInstance()->autoPinCheck = true;
+
+                if (CCMenu* rightSideMenu = typeinfo_cast<CCMenu*>(getChildByID("right-side-menu"))) {
+                    if (CCMenuItemSpriteExtra* globedButton = typeinfo_cast<CCMenuItemSpriteExtra*>(rightSideMenu->getChildByID("dankmeme.globed2/share-room-btn"))) {
+                        CCMenu* checkboxMenu = CCMenu::create();
+                        checkboxMenu->setContentSize({76, 30});
+                        checkboxMenu->setAnchorPoint({0, 0});
+                        checkboxMenu->ignoreAnchorPointForPosition(false);
+                        checkboxMenu->setScale(0.7f);
+                        checkboxMenu->setPosition(-5, -3);
+
+                        RowLayout* layout = RowLayout::create();
+                        layout->setGap(0);
+                        checkboxMenu->setLayout(layout);
+
+                        CCMenuItemToggler* toggler = CCMenuItemToggler::createWithStandardSprites(this, menu_selector(LoquiLevelInfoLayer::onPinToggle), 1);
+                        checkboxMenu->addChild(toggler);
+
+                        globedButton->addChild(checkboxMenu);
+
+                        if (bool pin = Mod::get()->getSavedValue<bool>("auto-pin")) {
+                            toggler->toggle(pin);
+                            globedButton->activate();
+                        }
+
+                        CCLabelBMFont* autoLabel = CCLabelBMFont::create("Auto", "bigFont.fnt");
+                        autoLabel->setScale(0.7f);
+
+                        checkboxMenu->addChild(autoLabel);
+                        checkboxMenu->updateLayout();
+                    }
+                }
+
+                GlobalVars::getSharedInstance()->autoPinCheck = false;
+            }
             
             auto nextButtonSprite = CCSprite::createWithSpriteFrameName("GJ_arrow_03_001.png");
             nextButtonSprite->setFlipX(true);
@@ -234,6 +271,11 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
             GlobalVars::getSharedInstance()->isLoquiMenu = false;
         }
         return true;
+    }
+
+    void onPinToggle(CCObject* object) {
+        CCMenuItemToggler* toggler = static_cast<CCMenuItemToggler*>(object);
+        Mod::get()->setSavedValue("auto-pin", !toggler->isOn());
     }
 
     void updateLabelValues(){

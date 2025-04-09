@@ -24,6 +24,7 @@ public:
     bool isSearchScene;
     bool isViewer;
     bool onReqScene;
+    bool autoPinCheck;
     int idWithYouTube;
 
     std::vector<matjson::Value> currentLevelList;

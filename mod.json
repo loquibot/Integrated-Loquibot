@@ -1,10 +1,10 @@
 {
-	"geode": "4.2.0",
+	"geode": "4.3.0",
 	"gd": {
 		"win": "2.2074",
 		"mac": "2.2074"
 	},
-	"version": "v1.5.9",
+	"version": "v1.6.0",
 	"id": "alphalaneous.integratedloquibot",
 	"name": "Integrated Loquibot",
 	"developer": "Alphalaneous",
@@ -34,5 +34,13 @@
     },
     "tags": [
         "online"
-    ]
+    ],
+    "settings": {
+        "show-auto-pin": {
+            "type": "bool",
+            "name": "Show Auto Pin Checkbox for Globed",
+            "description": "If you are doing requests in a globed room, this will show a checkbox that allows you to automatically pin levels you go to.",
+            "default": false
+        }
+    }
 }
