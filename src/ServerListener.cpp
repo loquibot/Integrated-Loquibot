@@ -217,12 +217,14 @@ void ServerListener::onMessage(std::string message) {
                     std::string creator = "-";
                     std::string requester = "-";
                     std::string name = "Unknown";
+                    std::string chatMessage = "";
 
                     GlobalVars::getSharedInstance()->isButtonPressed = false;
 
                     name = levelJson["name"].asString().unwrapOr("");
                     creator =  levelJson["creator"].asString().unwrapOr("");
                     requester = levelJson["requester"].asString().unwrapOr("");
+                    chatMessage = levelJson["message"].asString().unwrapOr("");
 
                     GlobalVars::getSharedInstance()->requester = requester;
                     GlobalVars::getSharedInstance()->creator = creator;
@@ -265,6 +267,7 @@ void ServerListener::onMessage(std::string message) {
 
                     ((LoquiGJGameLevel*)levelData)->m_fields->m_requester = requester;
                     ((LoquiGJGameLevel*)levelData)->m_fields->m_isRequest = true;
+                    ((LoquiGJGameLevel*)levelData)->m_fields->m_message = chatMessage;
 
                     levelData->m_levelName = name;
                     levelData->m_creatorName = creator;
