@@ -76,7 +76,7 @@ class $modify(LoquiLevelInfoLayer, LevelInfoLayer) {
 
         if (level->m_levelID != GlobalVars::getSharedInstance()->currentID) {
             GlobalVars::getSharedInstance()->isLoquiMenu = false;
-            return false;
+            return true;
         }
         m_fields->m_message = static_cast<LoquiGJGameLevel*>(level)->m_fields->m_message;
 
